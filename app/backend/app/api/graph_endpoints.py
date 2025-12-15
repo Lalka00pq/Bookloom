@@ -40,3 +40,10 @@ async def add_edge(request: AddEdgeRequest):
         return new_edge
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/remove_edge/{source_id}/{target_id}")
+async def remove_edge(source_id: str, target_id: str):
+    if not graph_instance.remove_edge(source_id, target_id):
+        raise HTTPException(status_code=404, detail="Edge not found")
+    return {"message": "Edge removed successfully"}
