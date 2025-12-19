@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
-GOOGLE_BOOKS_API_URL = os.getenv("GOOGLE_BOOKS_API_URL")
+GOOGLE_BOOKS_API_URL = os.getenv("GOOGLE_BOOKS_API_ENDPOINT")
 
 if GOOGLE_BOOKS_API_KEY is None:
     raise ValueError("GOOGLE_BOOKS_API_KEY is not set")
