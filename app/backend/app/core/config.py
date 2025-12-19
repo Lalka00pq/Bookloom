@@ -1,5 +1,17 @@
+import os
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
+
+load_dotenv()
+GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
+GOOGLE_BOOKS_API_URL = os.getenv("GOOGLE_BOOKS_API_URL")
+
+if GOOGLE_BOOKS_API_KEY is None:
+    raise ValueError("GOOGLE_BOOKS_API_KEY is not set")
+if GOOGLE_BOOKS_API_URL is None:
+    raise ValueError("GOOGLE_BOOKS_API_URL is not set")
 
 
 class Settings(BaseSettings):
@@ -8,8 +20,8 @@ class Settings(BaseSettings):
 
 
 class ApiBooksSettings(BaseModel):
-    API_BOOKS_URL: str = "https://api.example.com/books"
-    API_BOOKS_KEY: str = "your_api"
+    API_BOOKS_URL: str = GOOGLE_BOOKS_API_URL
+    API_BOOKS_KEY: str = GOOGLE_BOOKS_API_KEY
 
 
 class ApiModelSettings(BaseModel):

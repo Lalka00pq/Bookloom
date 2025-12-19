@@ -13,8 +13,10 @@ class NetworkXGraph:
         return str(self._node_counter)
 
     def show_graph(self) -> Graph:
-        nodes = [Node(id=str(n), label=self.graph.nodes[n]['label'], properties=self.graph.nodes[n]['properties']) for n in self.graph.nodes]
-        edges = [Edge(source=str(u), target=str(v), weight=self.graph.edges[u, v]['weight']) for u, v in self.graph.edges]
+        nodes = [Node(id=str(n), label=self.graph.nodes[n]['label'],
+                      properties=self.graph.nodes[n]['properties']) for n in self.graph.nodes]
+        edges = [Edge(source=str(u), target=str(
+            v), weight=self.graph.edges[u, v]['weight']) for u, v in self.graph.edges]
         return Graph(nodes=nodes, edges=edges)
 
     def add_node(self, label: str, properties: Dict[str, Any]) -> Node:
