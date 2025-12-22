@@ -51,5 +51,4 @@ class NetworkXGraph:
         return False
 
 
-# Create a singleton instance of the graph
 graph_instance = NetworkXGraph()

@@ -13,4 +13,9 @@ router = APIRouter(
             response_model=Dict[str, str],
             status_code=200)
 async def health_check() -> Dict[str, str]:
+    """Check if the API is running
+
+    Returns:
+        Dict[str, str]: message about the success of the operation
+    """
     return {"status": "200 OK"}

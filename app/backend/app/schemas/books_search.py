@@ -4,24 +4,24 @@ from pydantic import BaseModel
 
 
 class BookSearchRequest(BaseModel):
-    """Схема входящего запроса для поиска книг."""
+    """Schema of the incoming request for searching books."""
 
     query: str
     max_results: int = 10
 
 
 class BookSearchItem(BaseModel):
-    """Элемент результата поиска книги (адаптация ответа Google Books API).
+    """Item of the search result of a book (adaptation of the response from Google Books API).
 
-    Поля, необходимые для отрисовки:
-    - author: автор(ы) книги
-    - title: название книги
-    - code: код книги (id в Google Books)
-    - published: дата публикации
-    - isbn: основной ISBN (10/13)
-    - subjects: список категорий / тем
-    - description: описание книги
-    - cover: URL обложки
+    Fields required for rendering:
+    - author: author(s) of the book
+    - title: title of the book
+    - code: code of the book (id in Google Books)
+    - published: publication date
+    - isbn: main ISBN (10/13)
+    - subjects: list of categories / topics
+    - description: description of the book
+    - cover: URL of the cover
     """
 
     author: str
@@ -35,6 +35,6 @@ class BookSearchItem(BaseModel):
 
 
 class BookSearchResponse(BaseModel):
-    """Список найденных книг (упрощённый ответ Google Books API)."""
+    """List of found books (simplified response from Google Books API)."""
 
     items: List[BookSearchItem]

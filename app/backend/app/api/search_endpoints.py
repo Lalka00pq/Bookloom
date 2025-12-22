@@ -16,10 +16,22 @@ api_books_settings = ApiBooksSettings()
 @router.post(
     "/search",
     response_model=BookSearchResponse,
-    summary="Поиск книг через Google Books API",
-    description="Выполняет поиск книг в Google Books и возвращает список результатов",
+    summary="Search books through Google Books API",
+    description="Search books in Google Books and return list of results",
 )
 async def search_books(request: BookSearchRequest) -> BookSearchResponse:
+    """Search books through Google Books API
+
+    Args:
+        request (BookSearchRequest): request with query and max results
+
+    Raises:
+        HTTPException: if the Google Books API returns an error
+        HTTPException: if the Google Books API returns an exception
+
+    Returns:
+        BookSearchResponse: list of search results
+    """
     params = {
         "q": request.query,
         "maxResults": request.max_results,
@@ -32,13 +44,13 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=502,
-            detail=f"Ошибка при обращении к Google Books API: {exc}",
+            detail=f"Error Google Books API: {exc}",
         ) from exc
 
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail="Google Books API вернул ошибку",
+            detail="Google Books API returned an Exception",
         )
 
     data = response.json()
@@ -51,15 +63,12 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
         code = item.get("id") or ""
 
         if not title:
-            # пропускаем записи без названия
             continue
 
         author = ", ".join(authors) if authors else ""
 
-        # Published date
         published = volume_info.get("publishedDate")
 
-        # ISBN: берём сначала ISBN_13, потом ISBN_10, если есть
         isbn = None
         for ident in volume_info.get("industryIdentifiers", []) or []:
             id_type = ident.get("type")
