@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, Optional
 import networkx as nx
 from app.schemas.graph import Node, Edge, Graph
 
@@ -49,6 +49,26 @@ class NetworkXGraph:
             self.graph.remove_edge(source, target)
             return True
         return False
+
+    def find_node_by_property(self, property_key: str, property_value: Any) -> Optional[Node]:
+        """Find a node by a specific property value.
+
+        Args:
+            property_key: The key of the property to search for
+            property_value: The value of the property to match
+
+        Returns:
+            Node if found, None otherwise
+        """
+        for node_id in self.graph.nodes:
+            node_properties = self.graph.nodes[node_id].get('properties', {})
+            if node_properties.get(property_key) == property_value:
+                return Node(
+                    id=node_id,
+                    label=self.graph.nodes[node_id]['label'],
+                    properties=node_properties
+                )
+        return None
 
 
 graph_instance = NetworkXGraph()
