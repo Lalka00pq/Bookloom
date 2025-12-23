@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 import httpx
 
 from app.core.config import ApiBooksSettings
+from app.core.logging import get_logger
 from app.schemas.books_search import (
     BookSearchRequest,
     BookSearchItem,
@@ -9,6 +10,7 @@ from app.schemas.books_search import (
 )
 
 router = APIRouter()
+logger = get_logger(__name__)
 
 api_books_settings = ApiBooksSettings()
 
@@ -32,6 +34,12 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
     Returns:
         BookSearchResponse: list of search results
     """
+    logger.info(
+        "Searching books",
+        query=request.query,
+        max_results=request.max_results,
+    )
+
     params = {
         "q": request.query,
         "maxResults": request.max_results,
@@ -42,12 +50,23 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(api_books_settings.API_BOOKS_URL, params=params)
     except httpx.RequestError as exc:
+        logger.error(
+            "Error connecting to Google Books API",
+            query=request.query,
+            error=str(exc),
+            exc_info=True,
+        )
         raise HTTPException(
             status_code=502,
             detail=f"Error Google Books API: {exc}",
         ) from exc
 
     if response.status_code != 200:
+        logger.warning(
+            "Google Books API returned error",
+            query=request.query,
+            status_code=response.status_code,
+        )
         raise HTTPException(
             status_code=response.status_code,
             detail="Google Books API returned an Exception",
@@ -105,5 +124,11 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
                 cover=cover,
             )
         )
+
+    logger.info(
+        "Books search completed",
+        query=request.query,
+        items_found=len(items),
+    )
 
     return BookSearchResponse(items=items)

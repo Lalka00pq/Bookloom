@@ -2,10 +2,12 @@
 from fastapi import APIRouter, HTTPException
 
 from app.core.graph import graph_instance
+from app.core.logging import get_logger
 from app.schemas.books_search import BookSearchItem
 from app.schemas.graph import Node
 
 router = APIRouter()
+logger = get_logger(__name__)
 
 BOOK_LABEL = "book"
 CODE_PROPERTY_KEY = "code"
@@ -38,14 +40,28 @@ async def add_book_to_graph(book: BookSearchItem) -> Node:
     Returns:
         Node: The book node added to or found in the graph
     """
+    logger.info(
+        "Adding book to graph",
+        book_code=book.code,
+        book_title=book.title,
+    )
+
     # Validate required fields
     if not book.code:
+        logger.warning(
+            "Validation failed: book code is required",
+            book_title=book.title if book.title else "unknown",
+        )
         raise HTTPException(
             status_code=422,
             detail="Book code is required",
         )
 
     if not book.title:
+        logger.warning(
+            "Validation failed: book title is required",
+            book_code=book.code,
+        )
         raise HTTPException(
             status_code=422,
             detail="Book title is required",
@@ -56,6 +72,11 @@ async def add_book_to_graph(book: BookSearchItem) -> Node:
         CODE_PROPERTY_KEY, book.code
     )
     if existing_node:
+        logger.info(
+            "Book already exists in graph",
+            book_code=book.code,
+            node_id=existing_node.id,
+        )
         return existing_node
 
     # Create book properties for the graph node
@@ -73,4 +94,12 @@ async def add_book_to_graph(book: BookSearchItem) -> Node:
     # Add node to graph
     new_node = graph_instance.add_node(
         label=BOOK_LABEL, properties=book_properties)
+
+    logger.info(
+        "Book added to graph successfully",
+        book_code=book.code,
+        node_id=new_node.id,
+        book_title=book.title,
+    )
+
     return new_node
