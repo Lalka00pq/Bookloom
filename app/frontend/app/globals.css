@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
+
+  --color-page: #050505;
+  --color-foreground: #ffffff;
+  --color-cyan: #00fff7;
+  --color-magenta: #ff00ff;
+
+  --color-cyan-500: #00fff7;
+  --color-cyan-400: #33fff9;
+  --color-cyan-300: #66fffb;
+  --color-magenta-500: #ff00ff;
+  --color-magenta-400: #ff33ff;
+  --color-magenta-300: #ff66ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-page);
+  color: var(--color-foreground);
+}
+
+/* Subtle grid pattern overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 255, 247, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 247, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-page {
+  background-color: var(--color-page);
+}
+
+.text-foreground {
+  color: var(--color-foreground);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Neon glow effects */
+.glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 255, 247, 0.5), 0 0 20px rgba(0, 255, 247, 0.3);
+}
+
+.glow-magenta {
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.glow-cyan-text {
+  text-shadow: 0 0 10px rgba(0, 255, 247, 0.8), 0 0 20px rgba(0, 255, 247, 0.5);
+}
+
+.glow-magenta-text {
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.8), 0 0 20px rgba(255, 0, 255, 0.5);
+}
+
+/* Cyberpunk panel styles */
+.panel-cyber {
+  @apply bg-black/60 backdrop-blur-sm border border-cyan-500/30 shadow-[0_0_20px_rgba(0,255,247,0.2)];
+}
+
+.panel-cyber-magenta {
+  @apply bg-black/60 backdrop-blur-sm border border-magenta-500/30 shadow-[0_0_20px_rgba(255,0,255,0.2)];
+}
+
+/* Scrollbar styling */
+.panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 247, 0.3) transparent;
+}
+
+.panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 247, 0.3);
+  border-radius: 3px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 247, 0.5);
+}
+
+/* Scanline effect */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 247, 0.1),
+    transparent
+  );
+  animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Terminal input style */
+.terminal-input {
+  @apply bg-black/40 border border-cyan-500/30 text-white font-mono;
+  @apply focus:border-cyan-500 focus:shadow-[0_0_15px_rgba(0,255,247,0.5)] focus:outline-none;
+  @apply transition-all duration-200;
+}
+
+/* Neon button styles */
+.btn-neon {
+  @apply border border-cyan-500/50 bg-black/40 text-cyan-400 font-mono text-sm;
+  @apply hover:bg-cyan-500/10 hover:border-cyan-500 hover:text-cyan-300;
+  @apply hover:shadow-[0_0_20px_rgba(0,255,247,0.5)];
+  @apply transition-all duration-200;
+}
+
+.btn-neon-magenta {
+  @apply border border-magenta-500/50 bg-black/40 text-magenta-400 font-mono text-sm;
+  @apply hover:bg-magenta-500/10 hover:border-magenta-500 hover:text-magenta-300;
+  @apply hover:shadow-[0_0_20px_rgba(255,0,255,0.5)];
+  @apply transition-all duration-200;
+}
+
+/* Data block style for library items */
+.data-block {
+  @apply bg-black/40 border-l-2 border-cyan-500/50 p-3;
+  @apply hover:bg-black/60 hover:border-cyan-500 hover:shadow-[0_0_15px_rgba(0,255,247,0.3)];
+  @apply transition-all duration-200;
+}
+
+/* Pulse animation for active states */
+@keyframes pulse-neon {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(0, 255, 247, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 20px rgba(0, 255, 247, 0.8);
+  }
+}
+
+.pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+
