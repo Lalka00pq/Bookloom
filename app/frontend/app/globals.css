@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Georgia", "Times New Roman", ui-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+
+  --color-page: #120c07;
+  --color-foreground: #fef3c7;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.bg-page {
+  background-color: var(--color-page);
+}
+
+.text-foreground {
+  color: var(--color-foreground);
+}
+
+/* Фон раскрытой старой книги */
+.bg-book-texture {
+  background-image: url("https://images.pexels.com/photos/46274/pexels-photo-46274.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+
+.card-glass {
+  @apply bg-amber-50/80 dark:bg-amber-50/80 backdrop-blur-md border border-amber-200/70 shadow-[0_18px_45px_rgba(15,8,3,0.75)] rounded-3xl;
+}
+
+.card-soft {
+  @apply bg-amber-50/75 backdrop-blur-md border border-amber-200/60 shadow-[0_14px_32px_rgba(17,12,8,0.65)] rounded-3xl;
+}
+
+.panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 53, 15, 0.8) transparent;
+}
+
+.panel-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, rgba(120, 53, 15, 0.9), rgba(249, 115, 22, 0.6));
+  border-radius: 9999px;
+}
+
+.heading-serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.ink-fade-in {
+  animation: ink-fade-in 650ms ease-out forwards;
+}
+
+@keyframes ink-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.tactile {
+  @apply transition-transform duration-200 ease-out;
+}
+
+.tactile:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.tactile:active {
+  transform: translateY(0) scale(0.99);
+}
+
+
