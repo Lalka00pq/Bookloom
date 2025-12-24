@@ -52,7 +52,7 @@ export function GraphField({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-[#00fff7]" />
           <h2 className="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider">
-            Graph Field
+            Books Graph
           </h2>
         </div>
       </header>

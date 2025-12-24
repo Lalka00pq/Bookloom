@@ -15,7 +15,7 @@ export function RecommendationsPanel({
       <header className="mb-3 sm:mb-4 flex items-center gap-2">
         <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff00ff]" />
         <h2 className="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider">
-          Recommendations field
+          Recommendations
         </h2>
       </header>
       <div className="panel-scroll flex-1 space-y-3 overflow-y-auto pr-2">
