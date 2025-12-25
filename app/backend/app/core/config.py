@@ -29,6 +29,15 @@ class ApiModelSettings(BaseModel):
     API_MODEL_KEY: str = "your_api"
 
 
+class HealthMonitorSettings(BaseModel):
+    """Settings for health monitoring service."""
+    enabled: bool = True
+    check_interval: int = 60  # seconds
+    base_url: str = "http://localhost:8000"
+    health_endpoint: str = "/health/check"
+    timeout: float = 5.0
+
+
 class API_Settings(BaseModel):
     api_books: "ApiBooksSettings" = ApiBooksSettings()
     api_model: "ApiModelSettings" = ApiModelSettings()
