@@ -4,6 +4,9 @@ import { Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useState } from "react";
 import type { GraphData, Book } from "../types";
+import { EditBookModal } from "./EditBookModal";
+import type { Node } from "../schemas/graph";
+import { graphApi } from "../utils/api";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -13,13 +16,17 @@ interface GraphFieldProps {
   graphData: GraphData;
   activeBook: Book | null;
   onNodeClick: (nodeId: string) => void;
+  onNodeEdit?: (nodeId: string, newDescription: string) => Promise<void>;
 }
 
 export function GraphField({
   graphData,
   activeBook,
   onNodeClick,
+  onNodeEdit,
 }: GraphFieldProps) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
@@ -55,6 +62,11 @@ export function GraphField({
             Books Graph
           </h2>
         </div>
+        {onNodeEdit && (
+          <p className="text-[10px] text-gray-500 font-mono hidden sm:block">
+            ПКМ для редактирования
+          </p>
+        )}
       </header>
 
       {/* Graph Container */}
@@ -84,7 +96,24 @@ export function GraphField({
           maxZoom={2.5}
           onNodeClick={(node: any) => {
             if (node.kind === "book") {
+              // Обычный клик - выбор книги
               onNodeClick(node.id as string);
+            }
+          }}
+          onNodeRightClick={(node: any) => {
+            // Правый клик - редактирование
+            if (node.kind === "book" && onNodeEdit) {
+              const graphNode = graphData.nodes.find((n) => n.id === node.id);
+              if (graphNode) {
+                // Преобразуем GraphNode в Node для модального окна
+                const nodeForEdit: Node = {
+                  id: graphNode.id,
+                  label: graphNode.label,
+                  properties: graphNode.properties || {},
+                };
+                setSelectedNode(nodeForEdit);
+                setSelectedNodeId(node.id as string);
+              }
             }
           }}
           nodeCanvasObject={(node: any, ctx, globalScale) => {
@@ -152,6 +181,23 @@ export function GraphField({
           }}
         />
       </div>
+
+      {/* Edit Book Modal */}
+      {selectedNode && onNodeEdit && (
+        <EditBookModal
+          isOpen={selectedNodeId !== null}
+          onClose={() => {
+            setSelectedNodeId(null);
+            setSelectedNode(null);
+          }}
+          node={selectedNode}
+          onSave={async (nodeId, description) => {
+            await onNodeEdit(nodeId, description);
+            setSelectedNodeId(null);
+            setSelectedNode(null);
+          }}
+        />
+      )}
     </section>
   );
 }

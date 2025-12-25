@@ -14,7 +14,6 @@ export function useBooks(initialBooks: Book[]) {
 
   const addBook = (book: Book) => {
     setBooks((prev) => {
-      // Проверяем, нет ли уже такой книги
       if (prev.some((b) => b.id === book.id)) {
         return prev;
       }

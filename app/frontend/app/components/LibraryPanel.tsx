@@ -4,6 +4,12 @@ import { Library } from "lucide-react";
 import type { Book } from "../types";
 import { classNames } from "../utils/classNames";
 
+interface LibraryPanelProps {
+  books: Book[];
+  activeBookId: string | null;
+  onBookSelect: (bookId: string) => void;
+}
+
 export function LibraryPanel({
   books,
   activeBookId,

@@ -19,6 +19,7 @@ export type GraphNode = {
   id: string;
   label: string;
   kind: "book" | "theme";
+  properties?: Record<string, any>;
 };
 
 export type GraphLink = {

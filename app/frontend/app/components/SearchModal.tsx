@@ -1,70 +1,30 @@
 "use client";
 
 import { X, Plus, BookOpen } from "lucide-react";
-import { useEffect } from "react";
-import type { Book } from "../types";
+import { useEffect, useState } from "react";
+import type { BookSearchItem } from "../schemas/books_search";
+import { booksSearchApi, ApiError } from "../utils/api";
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   searchQuery: string;
-  searchResults: Book[];
-  existingBookIds: Set<string>;
-  onAddBook: (book: Book) => void;
+  existingBookCodes: Set<string>;
+  onAddBook: (book: BookSearchItem) => void;
 }
 
-// Моковые данные для поиска (в реальном приложении это будет API запрос)
-const SEARCH_RESULTS_MOCK: Book[] = [
-  {
-    id: "6",
-    title: "1984",
-    author: "Джордж Оруэлл",
-    year: 1949,
-    tags: ["антиутопия", "политика", "классика"],
-    progress: 0,
-  },
-  {
-    id: "7",
-    title: "Преступление и наказание",
-    author: "Фёдор Достоевский",
-    year: 1866,
-    tags: ["психология", "философия", "классика"],
-    progress: 0,
-  },
-  {
-    id: "8",
-    title: "Война и мир",
-    author: "Лев Толстой",
-    year: 1869,
-    tags: ["история", "война", "классика"],
-    progress: 0,
-  },
-  {
-    id: "9",
-    title: "Гарри Поттер и философский камень",
-    author: "Дж. К. Роулинг",
-    year: 1997,
-    tags: ["фэнтези", "магия", "приключения"],
-    progress: 0,
-  },
-  {
-    id: "10",
-    title: "Властелин колец",
-    author: "Дж. Р. Р. Толкин",
-    year: 1954,
-    tags: ["фэнтези", "приключения", "эпика"],
-    progress: 0,
-  },
-];
 
 export function SearchModal({
   isOpen,
   onClose,
   searchQuery,
-  searchResults,
-  existingBookIds,
+  existingBookCodes,
   onAddBook,
 }: SearchModalProps) {
+  const [searchResults, setSearchResults] = useState<BookSearchItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   // Закрытие по Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -76,19 +36,45 @@ export function SearchModal({
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  // Поиск книг при открытии модального окна
+  useEffect(() => {
+    if (isOpen && searchQuery.trim()) {
+      performSearch();
+    } else {
+      setSearchResults([]);
+      setError(null);
+    }
+  }, [isOpen, searchQuery]);
 
-  // Фильтруем результаты поиска
-  const filteredResults = searchQuery.trim()
-    ? SEARCH_RESULTS_MOCK.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.tags.some((tag) =>
-            tag.toLowerCase().includes(searchQuery.toLowerCase()),
-          ),
-      )
-    : SEARCH_RESULTS_MOCK;
+  const performSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await booksSearchApi.search(searchQuery.trim(), 10);
+      setSearchResults(response.items);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(
+          err.statusCode === 502
+            ? "Ошибка подключения к Google Books API"
+            : err.message,
+        );
+      } else {
+        setError("Произошла ошибка при поиске книг");
+      }
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -125,38 +111,63 @@ export function SearchModal({
 
         {/* Results List */}
         <div className="panel-scroll flex-1 overflow-y-auto pr-2 space-y-3">
-          {filteredResults.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-gray-400 font-mono">Поиск книг...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-red-400 font-mono">{error}</p>
+            </div>
+          ) : searchResults.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-sm text-gray-500 font-mono">
-                No books found for "{searchQuery}"
+                {searchQuery.trim()
+                  ? `Книги не найдены для "${searchQuery}"`
+                  : "Введите название книги для поиска"}
               </p>
             </div>
           ) : (
-            filteredResults.map((book) => {
-              const isAlreadyAdded = existingBookIds.has(book.id);
+            searchResults.map((book) => {
+              const isAlreadyAdded = existingBookCodes.has(book.code);
               return (
                 <div
-                  key={book.id}
+                  key={book.code}
                   className="bg-black/40 border border-[#00fff7]/30 rounded p-4 hover:border-[#00fff7]/60 hover:bg-black/60 transition-all duration-200"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
+                      {book.cover && (
+                        <img
+                          src={book.cover}
+                          alt={book.title}
+                          className="float-left mr-3 mb-2 w-16 h-24 object-cover rounded"
+                        />
+                      )}
                       <h3 className="text-sm sm:text-base font-semibold text-white mb-1">
                         {book.title}
                       </h3>
                       <p className="text-xs text-gray-400 font-mono mb-2">
-                        {book.author} · {book.year}
+                        {book.author}
+                        {book.published && ` · ${book.published}`}
                       </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {book.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-[10px] px-2 py-0.5 bg-[#00fff7]/10 text-[#00fff7] rounded font-mono border border-[#00fff7]/20"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                      {book.description && (
+                        <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                          {book.description}
+                        </p>
+                      )}
+                      {book.subjects.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {book.subjects.slice(0, 5).map((subject) => (
+                            <span
+                              key={subject}
+                              className="text-[10px] px-2 py-0.5 bg-[#00fff7]/10 text-[#00fff7] rounded font-mono border border-[#00fff7]/20"
+                            >
+                              {subject}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => {
@@ -173,12 +184,12 @@ export function SearchModal({
                       {isAlreadyAdded ? (
                         <>
                           <X className="h-4 w-4" />
-                          <span className="hidden sm:inline">Added</span>
+                          <span className="hidden sm:inline">Добавлено</span>
                         </>
                       ) : (
                         <>
                           <Plus className="h-4 w-4" />
-                          <span className="hidden sm:inline">Add to Graph</span>
+                          <span className="hidden sm:inline">Добавить в граф</span>
                         </>
                       )}
                     </button>
@@ -190,10 +201,11 @@ export function SearchModal({
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-[#00fff7]/20 text-xs text-gray-500 font-mono text-center">
-          {filteredResults.length} book{filteredResults.length !== 1 ? "s" : ""}{" "}
-          found
-        </div>
+        {!isLoading && !error && searchResults.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-[#00fff7]/20 text-xs text-gray-500 font-mono text-center">
+            Найдено книг: {searchResults.length}
+          </div>
+        )}
       </div>
     </div>
   );

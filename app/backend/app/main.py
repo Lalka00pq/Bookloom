@@ -8,6 +8,7 @@ from app.core.config import HealthMonitorSettings
 from app.core.health_monitor import HealthMonitorService, IHealthMonitor
 # 3rd party
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
 import time
@@ -85,6 +86,15 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 logger.info("Application initialized")
 
+# Setup CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # В продакшене нужно указать конкретные домены
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешаем все HTTP методы
+    allow_headers=["*"],  # Разрешаем все заголовки
+)
+
 # Setup middleware for request logging
 
 
@@ -99,32 +109,34 @@ async def log_requests(request: Request, call_next):
     path = request.url.path
     client_ip = request.client.host if request.client else "unknown"
 
-    # Log request start
-    logger.info(
-        "Request received",
-        method=method,
-        path=path,
-        url=url,
-        client_ip=client_ip,
-    )
+    # Log request start (skip OPTIONS for less noise, but still process them)
+    if method != "OPTIONS":
+        logger.info(
+            "Request received",
+            method=method,
+            path=path,
+            url=url,
+            client_ip=client_ip,
+        )
 
     try:
-        # Process request
+        # Process request (CORS middleware will handle OPTIONS)
         response = await call_next(request)
 
         # Calculate processing time
         process_time = time.time() - start_time
         status_code = response.status_code
 
-        # Log response
-        logger.info(
-            "Request completed",
-            method=method,
-            path=path,
-            status_code=status_code,
-            process_time=f"{process_time:.4f}s",
-            client_ip=client_ip,
-        )
+        # Log response (skip OPTIONS for less noise)
+        if method != "OPTIONS":
+            logger.info(
+                "Request completed",
+                method=method,
+                path=path,
+                status_code=status_code,
+                process_time=f"{process_time:.4f}s",
+                client_ip=client_ip,
+            )
 
         return response
 

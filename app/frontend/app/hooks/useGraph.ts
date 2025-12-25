@@ -1,62 +1,57 @@
-import { useMemo } from "react";
-import type { Book, GraphData } from "../types";
+import { useState, useEffect, useCallback } from "react";
+import type { GraphData } from "../types";
+import type { Graph, Node } from "../schemas/graph";
+import { graphApi } from "../utils/api";
 
-const THEME_NODES = [
-  { id: "t-dark-atmosphere", label: "Мрачная атмосфера", kind: "theme" as const },
-  { id: "t-memory", label: "Память и время", kind: "theme" as const },
-  { id: "t-magic-realism", label: "Магический реализм", kind: "theme" as const },
-  { id: "t-war-exile", label: "Война и изгнание", kind: "theme" as const },
-];
+export function useGraph() {
+  const [graphData, setGraphData] = useState<GraphData>({
+    nodes: [],
+    links: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export function useGraph(books: Book[]) {
-  const graphData = useMemo<GraphData>(() => {
-    const bookNodes = books.map((b) => ({
-      id: b.id,
-      label: b.title,
-      kind: "book" as const,
-    }));
+  const loadGraph = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const graph: Graph = await graphApi.showGraph();
+      
+      // Преобразуем данные графа из backend в формат для визуализации
+      const nodes = graph.nodes.map((node: Node) => ({
+        id: node.id,
+        label: node.label,
+        kind: node.properties?.code ? ("book" as const) : ("theme" as const),
+        properties: node.properties,
+      }));
 
-    // Генерируем связи на основе тегов книг
-    const links: GraphData["links"] = [];
+      const links = graph.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+        kind: "similar-theme" as const,
+      }));
+
+      setGraphData({ nodes, links });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка загрузки графа");
+      setGraphData({ nodes: [], links: [] });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadGraph();
     
-    books.forEach((book) => {
-      // Связь с темами на основе тегов
-      if (book.tags.some((t) => t.includes("готика") || t.includes("мрач"))) {
-        links.push({
-          source: book.id,
-          target: "t-dark-atmosphere",
-          kind: "similar-theme",
-        });
-      }
-      if (book.tags.some((t) => t.includes("память") || t.includes("время"))) {
-        links.push({
-          source: book.id,
-          target: "t-memory",
-          kind: "shared-motif",
-        });
-      }
-      if (book.tags.some((t) => t.includes("магический") || t.includes("реализм"))) {
-        links.push({
-          source: book.id,
-          target: "t-magic-realism",
-          kind: "similar-mood",
-        });
-      }
-      if (book.tags.some((t) => t.includes("война") || t.includes("эмиграция"))) {
-        links.push({
-          source: book.id,
-          target: "t-war-exile",
-          kind: "shared-motif",
-        });
-      }
-    });
+    const interval = setInterval(loadGraph, 5000);
+    return () => clearInterval(interval);
+  }, [loadGraph]);
 
-    return {
-      nodes: [...bookNodes, ...THEME_NODES],
-      links,
-    };
-  }, [books]);
-
-  return graphData;
+  return {
+    graphData,
+    isLoading,
+    error,
+    refreshGraph: loadGraph,
+  };
 }
 
