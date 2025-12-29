@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -32,12 +33,7 @@ class IRecommendationService(ABC):
 
 class GeminiRecommendationService(IRecommendationService):
     """
-    Реализация сервиса рекомендаций через Google Gemini.
-
-    Сервис:
-    - асинхронный (httpx.AsyncClient),
-    - изолирован от FastAPI (легко тестировать и масштабировать),
-    - использует конфиг GeminiSettings.
+    Recommendation service.
     """
 
     def __init__(self, settings: GeminiSettings | None = None) -> None:
@@ -98,15 +94,15 @@ class GeminiRecommendationService(IRecommendationService):
 
     def _build_prompt(self, *, user_id: str, graph: Graph, limit: int) -> str:
         """
-        Строим промпт: передаём структуру графа и просим вернуть чистый JSON.
+        Prompt for model.
         """
         graph_payload = graph.model_dump()
         instruction = {
             "instruction": (
-                "Ты система рекомендаций книг. "
-                "Анализируй граф прочитанных и связанных книг пользователя "
-                "и верни рекомендации ТОЛЬКО в виде валидного JSON без "
-                "поясняющего текста. Формат ответа (не использовать разметку Markdown, ответ только JSON):\n\n"
+                "You are a book recommendation system. "
+                "Analyze the graph of books read and related books for user "
+                "and return recommendations ONLY in valid JSON format without "
+                "explanatory text. Response format (do not use Markdown markup, response in JSON only):\n\n"
                 "{\n"
                 '  "recommendations": [\n'
                 "    {\n"
@@ -119,12 +115,46 @@ class GeminiRecommendationService(IRecommendationService):
                 "    }\n"
                 "  ]\n"
                 "}\n\n"
-                f"Максимальное количество рекомендаций: {limit}."
+                f"Max number of recommendations: {limit}."
             ),
             "user_id": user_id,
             "graph": graph_payload,
         }
         return json.dumps(instruction, ensure_ascii=False)
+
+    def _clean_response_text(self, text: str) -> str:
+        """
+        Response text cleaning.
+
+        Remove:
+        - Markdown code (```json ... ```)
+        - Spaces before/after JSON
+        - Explain text
+
+        Args:
+            text: Response text
+
+        Returns:
+            json text
+        """
+
+        text = re.sub(r"^```(?:json)?\s*\n?", "", text,
+                      flags=re.MULTILINE | re.IGNORECASE)
+        text = re.sub(r"\n?```\s*$", "", text, flags=re.MULTILINE)
+
+        first_brace = text.find("{")
+        if first_brace > 0:
+            text = text[first_brace:]
+
+        last_brace = text.rfind("}")
+        if last_brace >= 0:
+            text = text[: last_brace + 1]
+
+        text = text.strip()
+
+        text = re.sub(r"\n\s*\n", "\n", text)
+
+        return text
 
     def _parse_response(
         self,
@@ -133,10 +163,7 @@ class GeminiRecommendationService(IRecommendationService):
         user_id: str,
     ) -> RecommendationsResponse:
         """
-        Разбор ответа Gemini.
-
-        Ожидаем, что модель вернула текст, внутри которого чистый JSON
-        вышеописанного формата. Если формат не совпадает, логируем и пробрасываем ошибку.
+        Gemini response parser.
         """
         try:
             text = (
@@ -150,13 +177,24 @@ class GeminiRecommendationService(IRecommendationService):
             )
             raise RuntimeError("Unexpected Gemini response structure") from exc
 
+        cleaned_text = self._clean_response_text(text)
+
+        self._logger.debug(
+            "Cleaned response text",
+            original_length=len(text),
+            cleaned_length=len(cleaned_text),
+            cleaned_preview=cleaned_text[:200] if len(
+                cleaned_text) > 200 else cleaned_text,
+        )
+
         try:
-            parsed = json.loads(text)
+            parsed = json.loads(cleaned_text)
         except json.JSONDecodeError as exc:
             self._logger.error(
                 "Failed to decode Gemini JSON response",
                 error=str(exc),
                 raw_text=text,
+                cleaned_text=cleaned_text,
             )
             raise RuntimeError(
                 "Failed to decode Gemini JSON response") from exc
@@ -175,7 +213,7 @@ class GeminiRecommendationService(IRecommendationService):
                 continue
             try:
                 recs.append(BookRecommendation(**item))
-            except Exception as exc:  # валидация Pydantic
+            except Exception as exc:
                 self._logger.error(
                     "Failed to parse single recommendation item",
                     error=str(exc),
@@ -184,3 +222,36 @@ class GeminiRecommendationService(IRecommendationService):
                 continue
 
         return RecommendationsResponse(user_id=user_id, recommendations=recs)
+
+    def parse_raw_response_text(
+        self,
+        *,
+        raw_text: str,
+        user_id: str,
+    ) -> RecommendationsResponse:
+        """
+        Parser Gemini response.
+
+.
+
+        Args:
+            raw_text: Сырой текст ответа от Gemini
+            user_id: Идентификатор пользователя
+
+        Returns:
+            RecommendationsResponse
+        """
+        mock_data = {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {
+                                "text": raw_text,
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        return self._parse_response(data=mock_data, user_id=user_id)

@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import APIRouter, HTTPException
 
 from app.core.graph import graph_instance
@@ -16,7 +14,6 @@ from app.schemas.recommendations import (
 router = APIRouter()
 logger = get_logger(__name__)
 
-# Инициализируем сервис рекомендаций один раз на модуль (масштабируемая зависимость).
 recommendation_service: IRecommendationService = GeminiRecommendationService()
 
 

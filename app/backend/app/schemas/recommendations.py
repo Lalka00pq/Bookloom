@@ -5,54 +5,50 @@ from pydantic import BaseModel, Field
 
 class UserRecommendationsRequest(BaseModel):
     """
-    Запрос на получение рекомендаций для пользователя на основе его графа прочитанных книг.
-    Сам граф на вход не передаётся – он извлекается на стороне backend из текущего состояния.
+    Request for getting recommendations for user.
     """
 
-    user_id: str = Field(..., description="Идентификатор пользователя")
+    user_id: str = Field(..., description="User identifier")
     limit: int = Field(
         default=10,
         ge=1,
         le=100,
-        description="Максимальное количество рекомендаций",
+        description="Max number of recommendations",
     )
 
 
 class BookRecommendation(BaseModel):
     """
-    Описание одной рекомендованной книги.
-    Поля сделаны максимально гибкими, чтобы их можно было масштабировать без смены контракта.
+    Description of a book recommendation.
     """
 
     book_id: Optional[str] = Field(
-        default=None, description="Идентификатор книги во внутренней системе/графе"
+        default=None, description="Book's id in graph (optional)"
     )
-    title: str = Field(..., description="Название книги")
+    title: str = Field(..., description="Book's name")
     author: Optional[str] = Field(
-        default=None, description="Автор книги, если доступен"
+        default=None, description="Book's author"
     )
     reason: Optional[str] = Field(
         default=None,
-        description="Краткое текстовое объяснение, почему эта книга рекомендована",
+        description="Short description of the reason for recommendation",
     )
     score: Optional[float] = Field(
         default=None,
         ge=0.0,
         le=1.0,
-        description="Нормализованный скор релевантности рекомендации (0-1)",
+        description="Relevancy score of the recommendation",
     )
     metadata: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Произвольные дополнительные метаданные от модели (жанр, теги и т.п.)",
+        description="Metadata of the book",
     )
 
 
 class RecommendationsResponse(BaseModel):
-    """Ответ эндпоинта с рекомендациями для пользователя."""
+    """Response for getting recommendations for user."""
 
-    user_id: str = Field(..., description="Идентификатор пользователя")
+    user_id: str = Field(..., description="User's identifier")
     recommendations: List[BookRecommendation] = Field(
-        default_factory=list, description="Список рекомендованных книг"
+        default_factory=list, description="Books recommendations list"
     )
-
-
