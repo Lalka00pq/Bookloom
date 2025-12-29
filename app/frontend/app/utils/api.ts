@@ -1,6 +1,3 @@
-// API клиент для работы с backend
-// Принцип Single Responsibility: отдельный модуль для всех API запросов
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 class ApiError extends Error {
@@ -34,12 +31,10 @@ async function fetchApi<T>(
       errorData = await response.json();
       errorMessage = errorData.detail || errorMessage;
     } catch {
-      // Если не удалось распарсить JSON, используем стандартное сообщение
     }
     throw new ApiError(errorMessage, response.status, errorData);
   }
 
-  // Если ответ пустой, возвращаем пустой объект
   const contentType = response.headers.get("content-type");
   if (!contentType || !contentType.includes("application/json")) {
     return {} as T;
@@ -48,14 +43,12 @@ async function fetchApi<T>(
   return response.json();
 }
 
-// Health Check API
 export const healthApi = {
   check: async (): Promise<{ status: string }> => {
     return fetchApi<{ status: string }>("/health/check");
   },
 };
 
-// Books Search API
 export const booksSearchApi = {
   search: async (
     query: string,
@@ -71,7 +64,6 @@ export const booksSearchApi = {
   },
 };
 
-// Books Graph API
 export const booksGraphApi = {
   addToGraph: async (
     book: import("../schemas/books_search").BookSearchItem,
@@ -83,7 +75,6 @@ export const booksGraphApi = {
   },
 };
 
-// Graph API
 export const graphApi = {
   showGraph: async (): Promise<import("../schemas/graph").Graph> => {
     return fetchApi<import("../schemas/graph").Graph>("/graph/show_graph");
