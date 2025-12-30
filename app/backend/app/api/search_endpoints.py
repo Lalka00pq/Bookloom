@@ -1,6 +1,4 @@
-from fastapi import APIRouter, HTTPException
-import httpx
-
+# project
 from app.core.config import ApiBooksSettings
 from app.core.logging import get_logger
 from app.schemas.books_search import (
@@ -8,6 +6,11 @@ from app.schemas.books_search import (
     BookSearchItem,
     BookSearchResponse,
 )
+
+# 3rd party
+from fastapi import APIRouter, HTTPException
+import httpx
+
 
 router = APIRouter()
 logger = get_logger(__name__)
@@ -43,12 +46,15 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
     params = {
         "q": request.query,
         "maxResults": request.max_results,
-        "key": api_books_settings.API_BOOKS_KEY,
     }
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(api_books_settings.API_BOOKS_URL, params=params)
+            response = await client.get(
+                api_books_settings.API_BOOKS_URL,
+                params=params,
+                headers={"X-API-Key": api_books_settings.API_BOOKS_KEY},
+            )
     except httpx.RequestError as exc:
         logger.error(
             "Error connecting to Google Books API",

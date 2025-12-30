@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./app/backend/app/.env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+# Optional: add a network if you need custom settings
+networks:
+  default:
+    driver: bridge

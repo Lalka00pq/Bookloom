@@ -2,13 +2,14 @@
 from typing import Dict
 
 # project
-from app.schemas.graph import AddNodeRequest, ChangeNodeRequest, AddEdgeRequest, Graph, Node, Edge
+from app.schemas.graph import (AddNodeRequest, ChangeNodeRequest, AddEdgeRequest,
+                               Graph, Node, Edge)
 from app.core.graph import graph_instance
 from app.core.logging import get_logger
 
-
 # 3rd party
 from fastapi import APIRouter, HTTPException
+
 
 router = APIRouter()
 logger = get_logger(__name__)

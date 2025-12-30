@@ -10,15 +10,18 @@ export type Book = {
 export type Recommendation = {
   id: string;
   title: string;
-  author: string;
+  author: string | null;
   reason: string;
   matchScore: number; // 0–1
+  genre?: string;
+  tags?: string[];
 };
 
 export type GraphNode = {
   id: string;
   label: string;
   kind: "book" | "theme";
+  properties?: Record<string, any>;
 };
 
 export type GraphLink = {

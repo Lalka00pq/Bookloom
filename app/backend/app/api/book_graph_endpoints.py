@@ -1,15 +1,14 @@
-"""Endpoints for managing books in the user's graph."""
-from fastapi import APIRouter, HTTPException
-
+# project
 from app.core.graph import graph_instance
 from app.core.logging import get_logger
 from app.schemas.books_search import BookSearchItem
 from app.schemas.graph import Node
+# 3rd party
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 logger = get_logger(__name__)
 
-BOOK_LABEL = "book"
 CODE_PROPERTY_KEY = "code"
 
 
@@ -91,9 +90,9 @@ async def add_book_to_graph(book: BookSearchItem) -> Node:
         "cover": book.cover,
     }
 
-    # Add node to graph
+    # Add node to graph - используем название книги как label
     new_node = graph_instance.add_node(
-        label=BOOK_LABEL, properties=book_properties)
+        label=book.title, properties=book_properties)
 
     logger.info(
         "Book added to graph successfully",

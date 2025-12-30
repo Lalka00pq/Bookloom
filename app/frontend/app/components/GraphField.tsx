@@ -4,6 +4,9 @@ import { Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useState } from "react";
 import type { GraphData, Book } from "../types";
+import { EditBookModal } from "./EditBookModal";
+import type { Node } from "../schemas/graph";
+import { graphApi } from "../utils/api";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -13,13 +16,17 @@ interface GraphFieldProps {
   graphData: GraphData;
   activeBook: Book | null;
   onNodeClick: (nodeId: string) => void;
+  onNodeEdit?: (nodeId: string, newDescription: string) => Promise<void>;
 }
 
 export function GraphField({
   graphData,
   activeBook,
   onNodeClick,
+  onNodeEdit,
 }: GraphFieldProps) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
@@ -29,16 +36,19 @@ export function GraphField({
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(300, rect.width - 16), // Учитываем padding
-          height: Math.max(350, rect.height - 80), // Минимальная высота 350px
+          width: Math.max(300, rect.width - 16),
+          height: Math.max(350, rect.height - 80), 
         });
       }
     };
 
-    // Задержка для правильного расчета размеров после монтирования
-    const timeoutId = setTimeout(updateDimensions, 100);
-    updateDimensions();
-    
+    const timeoutId = setTimeout(() => {
+      updateDimensions();
+      if (graphRef.current) {
+        graphRef.current.zoom(0.7);
+      }
+    }, 100);
+
     window.addEventListener("resize", updateDimensions);
     return () => {
       clearTimeout(timeoutId);
@@ -55,6 +65,11 @@ export function GraphField({
             Books Graph
           </h2>
         </div>
+        {onNodeEdit && (
+          <p className="text-[10px] text-gray-500 font-mono hidden sm:block">
+            Right-click a book node to edit its description
+          </p>
+        )}
       </header>
 
       {/* Graph Container */}
@@ -79,12 +94,25 @@ export function GraphField({
           linkDirectionalParticleWidth={2}
           nodeRelSize={5}
           cooldownTicks={50}
-          zoom={0.7}
           minZoom={0.2}
           maxZoom={2.5}
           onNodeClick={(node: any) => {
             if (node.kind === "book") {
               onNodeClick(node.id as string);
+            }
+          }}
+          onNodeRightClick={(node: any) => {
+            if (node.kind === "book" && onNodeEdit) {
+              const graphNode = graphData.nodes.find((n) => n.id === node.id);
+              if (graphNode) {
+                const nodeForEdit: Node = {
+                  id: graphNode.id,
+                  label: graphNode.label,
+                  properties: graphNode.properties || {},
+                };
+                setSelectedNode(nodeForEdit);
+                setSelectedNodeId(node.id as string);
+              }
             }
           }}
           nodeCanvasObject={(node: any, ctx, globalScale) => {
@@ -105,7 +133,6 @@ export function GraphField({
             const radius = isBook ? 7 : 4;
             const mainColor = isBook ? "#00fff7" : "#ff00ff";
 
-            // Glow effect
             const gradientRadius = Math.max(
               isActive ? radius * 5 : radius * 3.5,
               radius + 2,
@@ -131,7 +158,6 @@ export function GraphField({
             ctx.arc(node.x, node.y, gradientRadius, 0, 2 * Math.PI, false);
             ctx.fill();
 
-            // Node core
             ctx.beginPath();
             ctx.fillStyle = mainColor;
             ctx.strokeStyle = isActive ? "#ffffff" : "#000000";
@@ -140,7 +166,6 @@ export function GraphField({
             ctx.fill();
             ctx.stroke();
 
-            // Label
             ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
@@ -152,7 +177,22 @@ export function GraphField({
           }}
         />
       </div>
+
+      {selectedNode && onNodeEdit && (
+        <EditBookModal
+          isOpen={selectedNodeId !== null}
+          onClose={() => {
+            setSelectedNodeId(null);
+            setSelectedNode(null);
+          }}
+          node={selectedNode}
+          onSave={async (nodeId, description) => {
+            await onNodeEdit(nodeId, description);
+            setSelectedNodeId(null);
+            setSelectedNode(null);
+          }}
+        />
+      )}
     </section>
   );
 }
-

@@ -1,7 +1,12 @@
+# python
 from typing import Dict
 
-from fastapi import APIRouter
+# project
 from app.core.logging import get_logger
+
+# 3rd party
+from fastapi import APIRouter
+
 
 router = APIRouter(
     prefix="/health",

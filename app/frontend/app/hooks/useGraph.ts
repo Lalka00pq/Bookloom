@@ -1,62 +1,75 @@
-import { useMemo } from "react";
-import type { Book, GraphData } from "../types";
+import { useState, useEffect, useCallback } from "react";
+import type { GraphData } from "../types";
+import type { Graph, Node } from "../schemas/graph";
+import { graphApi } from "../utils/api";
 
-const THEME_NODES = [
-  { id: "t-dark-atmosphere", label: "Мрачная атмосфера", kind: "theme" as const },
-  { id: "t-memory", label: "Память и время", kind: "theme" as const },
-  { id: "t-magic-realism", label: "Магический реализм", kind: "theme" as const },
-  { id: "t-war-exile", label: "Война и изгнание", kind: "theme" as const },
-];
+export function useGraph() {
+  const STORAGE_KEY = "graph_data";
 
-export function useGraph(books: Book[]) {
-  const graphData = useMemo<GraphData>(() => {
-    const bookNodes = books.map((b) => ({
-      id: b.id,
-      label: b.title,
-      kind: "book" as const,
-    }));
+  const getInitialGraph = (): GraphData => {
+    try {
+      if (typeof window === "undefined") return { nodes: [], links: [] };
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { nodes: [], links: [] };
+      const parsed = JSON.parse(raw) as GraphData;
+      if (parsed.nodes && Array.isArray(parsed.nodes)) return parsed;
+      return { nodes: [], links: [] };
+    } catch {
+      return { nodes: [], links: [] };
+    }
+  };
 
-    // Генерируем связи на основе тегов книг
-    const links: GraphData["links"] = [];
-    
-    books.forEach((book) => {
-      // Связь с темами на основе тегов
-      if (book.tags.some((t) => t.includes("готика") || t.includes("мрач"))) {
-        links.push({
-          source: book.id,
-          target: "t-dark-atmosphere",
-          kind: "similar-theme",
-        });
+  const [graphData, setGraphData] = useState<GraphData>(getInitialGraph);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadGraph = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const graph: Graph = await graphApi.showGraph();
+      
+      const nodes = graph.nodes.map((node: Node) => ({
+        id: node.id,
+        label: node.label,
+        kind: node.properties?.code ? ("book" as const) : ("theme" as const),
+        properties: node.properties,
+      }));
+
+      const links = graph.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+        kind: "similar-theme" as const,
+      }));
+
+      const newGraphData = { nodes, links };
+      setGraphData(newGraphData);
+      // Сохранить граф в localStorage
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newGraphData));
+        }
+      } catch {
+        // ignore storage errors
       }
-      if (book.tags.some((t) => t.includes("память") || t.includes("время"))) {
-        links.push({
-          source: book.id,
-          target: "t-memory",
-          kind: "shared-motif",
-        });
-      }
-      if (book.tags.some((t) => t.includes("магический") || t.includes("реализм"))) {
-        links.push({
-          source: book.id,
-          target: "t-magic-realism",
-          kind: "similar-mood",
-        });
-      }
-      if (book.tags.some((t) => t.includes("война") || t.includes("эмиграция"))) {
-        links.push({
-          source: book.id,
-          target: "t-war-exile",
-          kind: "shared-motif",
-        });
-      }
-    });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error loading graph");
+      setGraphData({ nodes: [], links: [] });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    return {
-      nodes: [...bookNodes, ...THEME_NODES],
-      links,
-    };
-  }, [books]);
+  useEffect(() => {
+    loadGraph();
+    return () => {};
+  }, [loadGraph]);
 
-  return graphData;
+  return {
+    graphData,
+    isLoading,
+    error,
+    refreshGraph: loadGraph,
+  };
 }
 

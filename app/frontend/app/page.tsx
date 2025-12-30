@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "./components/Header";
 import { LibraryPanel } from "./components/LibraryPanel";
 import { GraphField } from "./components/GraphField";
@@ -8,90 +8,18 @@ import { RecommendationsPanel } from "./components/RecommendationsPanel";
 import { SearchModal } from "./components/SearchModal";
 import { useBooks } from "./hooks/useBooks";
 import { useGraph } from "./hooks/useGraph";
+import { useHealthCheck } from "./hooks/useHealthCheck";
+import { useRecommendations } from "./hooks/useRecommendations";
+import { booksGraphApi, graphApi, ApiError } from "./utils/api";
 import type { Book, Recommendation } from "./types";
+import type { BookSearchItem } from "./schemas/books_search";
 
-const MOCK_BOOKS: Book[] = [
-  {
-    id: "1",
-    title: "Тень ветра",
-    author: "Карлос Руис Сафон",
-    year: 2001,
-    tags: ["готика", "барселона", "тайна"],
-    progress: 100,
-  },
-  {
-    id: "2",
-    title: "Имя розы",
-    author: "Умберто Эко",
-    year: 1980,
-    tags: ["средневековье", "детектив", "философия"],
-    progress: 78,
-  },
-  {
-    id: "3",
-    title: "Сто лет одиночества",
-    author: "Габриэль Гарсиа Маркес",
-    year: 1967,
-    tags: ["магический реализм", "семья", "латинская америка"],
-    progress: 42,
-  },
-  {
-    id: "4",
-    title: "Мастер и Маргарита",
-    author: "Михаил Булгаков",
-    year: 1967,
-    tags: ["мистика", "сатирa", "классика"],
-    progress: 100,
-  },
-  {
-    id: "5",
-    title: "Ночь в Лиссабоне",
-    author: "Эрих Мария Ремарк",
-    year: 1962,
-    tags: ["военный роман", "эмиграция", "любовь"],
-    progress: 15,
-  },
-  {
-    id: "6",
-    title: "На западном фронте без перемен",
-    author: "Эрих Мария Ремарк",
-    year: 1929,
-    tags: ["военный роман", "трагика", "классика"],
-    progress: 100,
-  },
-];
-
-const MOCK_RECOMMENDATIONS: Recommendation[] = [
-  {
-    id: "r1",
-    title: "Дом странных детей",
-    author: "Рэнсом Риггз",
-    reason:
-      "Тебя притягивает мрачная атмосфера и истории о памяти. Эта книга развивает мотивы ухода от реальности и семейных тайн.",
-    matchScore: 0.86,
-  },
-  {
-    id: "r2",
-    title: "Невыносимая лёгкость бытия",
-    author: "Милан Кундера",
-    reason:
-      "Тебе близки философские романы о свободе и выборе. Мотивы сомнения и исторической травмы перекликаются с твоим чтением.",
-    matchScore: 0.79,
-  },
-  {
-    id: "r3",
-    title: "Океан в конце дороги",
-    author: "Нил Гейман",
-    reason:
-      "Ты любишь магический реализм и мягкую, почти сказочную мрачность. Этот роман превращает детские воспоминания в мифологию.",
-    matchScore: 0.74,
-  },
-];
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const { isHealthy, isChecking } = useHealthCheck();
 
   const {
     books,
@@ -100,9 +28,37 @@ export default function Page() {
     setActiveBookId,
     addBook,
     filterBooks,
-  } = useBooks(MOCK_BOOKS);
+  } = useBooks([]);
 
-  const graphData = useGraph(books);
+  const { graphData, refreshGraph } = useGraph();
+  const { recommendations, isLoading: isLoadingRecs, error: recsError, fetchRecommendations, clearRecommendations } = useRecommendations({
+    limit: 10,
+  });
+
+  useEffect(() => {
+    const booksFromGraph: Book[] = graphData.nodes
+      .filter((node) => node.kind === "book" && node.properties?.code)
+      .map((node) => ({
+        id: (node.properties?.code as string) || "",
+        title: node.label,
+        author: (node.properties?.author as string) || "Unknown",
+        year: node.properties?.published
+          ? parseInt(
+              (node.properties.published as string).split("-")[0] || "0",
+            ) || 0
+          : 0,
+        tags: (node.properties?.subjects as string[]) || [],
+        progress: 0,
+      }));
+
+    const existingBookIds = new Set(books.map((b) => b.id));
+    booksFromGraph.forEach((book) => {
+      if (!existingBookIds.has(book.id)) {
+        addBook(book);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graphData.nodes.length, graphData.nodes.map((n) => n.id).join(",")]);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -110,18 +66,41 @@ export default function Page() {
     }
   };
 
-  const handleAnalyze = () => {
-    if (isAnalyzing) return;
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-    }, 2200);
+  const handleAnalyze = async () => {
+    if (graphData.nodes.length === 0) return;
+    await fetchRecommendations();
   };
 
-  const handleAddBook = (book: Book) => {
-    addBook(book);
-    setIsSearchModalOpen(false);
-    setSearchQuery("");
+  const handleAddBook = async (book: BookSearchItem) => {
+    try {
+      
+      await booksGraphApi.addToGraph(book);
+      
+
+      const bookForState: Book = {
+        id: book.code,
+        title: book.title,
+        author: book.author,
+        year: book.published ? parseInt(book.published.split("-")[0]) || 0 : 0,
+        tags: book.subjects || [],
+        progress: 0,
+      };
+      addBook(bookForState);
+      
+
+      refreshGraph();
+      
+      setIsSearchModalOpen(false);
+      setSearchQuery("");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        console.error("Error adding book:", error.message);
+        alert(`Ошибка: ${error.message}`);
+      } else {
+        console.error("Unexpected error:", error);
+        alert("Error adding book. Please try again.");
+      }
+    }
   };
 
   const filteredBooks = filterBooks(searchQuery);
@@ -129,15 +108,25 @@ export default function Page() {
   return (
     <main className="relative z-10 min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-[1920px]">
+        {/* Сообщение о недоступности backend */}
+        {!isChecking && isHealthy === false && (
+          <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+            <p className="text-sm text-red-300 font-mono">
+              ⚠️ Service is temporarily unavailable. Please try again later.
+            </p>
+          </div>
+        )}
+
         <Header
           query={searchQuery}
           onQueryChange={setSearchQuery}
           onSearch={handleSearch}
           onAnalyze={handleAnalyze}
-          isAnalyzing={isAnalyzing}
+          isAnalyzing={isLoadingRecs}
+          isGraphEmpty={graphData.nodes.length === 0}
         />
 
-        {/* Main layout - адаптивная сетка */}
+        {/* Main layout*/}
         <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(200px,280px)_1fr_minmax(200px,280px)] xl:grid-cols-[minmax(250px,320px)_1fr_minmax(250px,320px)]">
           <LibraryPanel
             books={filteredBooks}
@@ -148,10 +137,51 @@ export default function Page() {
           <GraphField
             graphData={graphData}
             activeBook={activeBook}
-            onNodeClick={setActiveBookId}
+            onNodeClick={(nodeId) => {
+
+              const node = graphData.nodes.find((n) => n.id === nodeId);
+              if (node && node.properties?.code) {
+
+                const book = books.find((b) => b.id === node.properties?.code);
+                if (book) {
+                  setActiveBookId(book.id);
+                }
+              }
+            }}
+            onNodeEdit={async (nodeId, newDescription) => {
+              try {
+                
+                const node = graphData.nodes.find((n) => n.id === nodeId);
+                if (!node) {
+                  throw new Error("Узел не найден");
+                }
+
+
+                await graphApi.changeNode(nodeId, {
+                  label: node.label,
+                  properties: {
+                    ...node.properties,
+                    description: newDescription,
+                  },
+                });
+
+                
+                await refreshGraph();
+              } catch (error) {
+                if (error instanceof ApiError) {
+                  throw new Error(error.message);
+                }
+                throw error;
+              }
+            }}
           />
 
-          <RecommendationsPanel recommendations={MOCK_RECOMMENDATIONS} />
+          <RecommendationsPanel
+            recommendations={recommendations}
+            isLoading={isLoadingRecs}
+            error={recsError}
+            isEmpty={graphData.nodes.length === 0}
+          />
         </section>
       </div>
 
@@ -163,26 +193,9 @@ export default function Page() {
           setSearchQuery("");
         }}
         searchQuery={searchQuery}
-        searchResults={[]}
-        existingBookIds={new Set(books.map((b) => b.id))}
+        existingBookCodes={new Set(books.map((b) => b.id))}
         onAddBook={handleAddBook}
       />
-
-      {/* Loading overlay for analysis */}
-      {isAnalyzing && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="panel-cyber p-6 rounded-lg max-w-sm text-center">
-            <div className="mb-4 flex items-center justify-center gap-2">
-              <span className="text-sm font-mono text-white uppercase tracking-wider">
-                Analyzing...
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 font-mono">
-              Processing connections and generating recommendations
-            </p>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
