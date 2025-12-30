@@ -107,9 +107,9 @@ class GeminiRecommendationService(IRecommendationService):
                 '  "recommendations": [\n'
                 "    {\n"
                 '      "book_id": "optional_internal_id_or_null",\n'
-                '      "title": "Название книги",\n'
-                '      "author": "Автор или null",\n'
-                '      "reason": "Причина рекомендации",\n'
+                '      "title": "Book title",\n'
+                '      "author": "Book author or null",\n'
+                '      "reason": "Reason for recommendation",\n'
                 '      "score": 0.0-1.0,\n'
                 '      "metadata": { "genre": "...", "tags": ["..."] }\n'
                 "    }\n"

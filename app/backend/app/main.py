@@ -1,3 +1,8 @@
+# python
+import asyncio
+import time
+from contextlib import asynccontextmanager
+
 # project
 from app.api.health_check import router as health_router
 from app.api.graph_endpoints import router as graph_router
@@ -7,12 +12,10 @@ from app.api.recommendations_endpoints import router as recommendations_router
 from app.core.logging import setup_logging, get_logger
 from app.core.config import HealthMonitorSettings
 from app.core.health_monitor import HealthMonitorService, IHealthMonitor
+
 # 3rd party
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import asyncio
-import time
 import uvicorn
 
 # Setup logging

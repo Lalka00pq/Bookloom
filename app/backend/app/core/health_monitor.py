@@ -1,16 +1,18 @@
-"""Health monitoring service for backend health checks."""
+# python
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 from datetime import datetime
 
-import httpx
+# project
 from app.core.logging import get_logger
-from app.core.config import Settings
+
+# 3rd party
+import httpx
 
 
 class HealthCheckResult:
     """Result of a health check operation."""
-    
+
     def __init__(
         self,
         is_healthy: bool,
@@ -19,14 +21,27 @@ class HealthCheckResult:
         error: Optional[str] = None,
         timestamp: Optional[datetime] = None,
     ):
+        """Initialize a new instance of HealthCheckResult.
+
+        Args:
+            is_healthy (bool): True if the service is healthy, False otherwise
+            status_code (Optional[int], optional): HTTP status code. Defaults to None.
+            response_time (Optional[float], optional): Response time in seconds. Defaults to None.
+            error (Optional[str], optional): Error message. Defaults to None.
+            timestamp (Optional[datetime], optional): Timestamp. Defaults to None.
+        """
         self.is_healthy = is_healthy
         self.status_code = status_code
         self.response_time = response_time
         self.error = error
         self.timestamp = timestamp or datetime.now()
-    
+
     def to_dict(self) -> Dict:
-        """Convert result to dictionary for logging."""
+        """Convert result to dictionary for logging.
+
+        Returns:
+            Dict: Dictionary representation of the result
+        """
         return {
             "is_healthy": self.is_healthy,
             "status_code": self.status_code,
@@ -38,11 +53,11 @@ class HealthCheckResult:
 
 class IHealthMonitor(ABC):
     """Interface for health monitoring service (Dependency Inversion Principle)."""
-    
+
     @abstractmethod
     async def check_health(self) -> HealthCheckResult:
         """Perform health check.
-        
+
         Returns:
             HealthCheckResult: Result of the health check
         """
@@ -51,7 +66,7 @@ class IHealthMonitor(ABC):
 
 class HealthMonitorService(IHealthMonitor):
     """Service for monitoring backend health status."""
-    
+
     def __init__(
         self,
         base_url: str = "http://localhost:8000",
@@ -59,7 +74,7 @@ class HealthMonitorService(IHealthMonitor):
         timeout: float = 5.0,
     ):
         """Initialize health monitor service.
-        
+
         Args:
             base_url: Base URL of the backend service
             health_endpoint: Health check endpoint path
@@ -69,29 +84,29 @@ class HealthMonitorService(IHealthMonitor):
         self.health_endpoint = health_endpoint
         self.timeout = timeout
         self.logger = get_logger(__name__)
-    
+
     async def check_health(self) -> HealthCheckResult:
         """Perform health check by calling the health endpoint.
-        
+
         Returns:
             HealthCheckResult: Result of the health check
         """
         url = f"{self.base_url}{self.health_endpoint}"
         start_time = datetime.now()
-        
+
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(url)
                 response_time = (datetime.now() - start_time).total_seconds()
-                
+
                 is_healthy = response.status_code == 200
-                
+
                 result = HealthCheckResult(
                     is_healthy=is_healthy,
                     status_code=response.status_code,
                     response_time=response_time,
                 )
-                
+
                 if is_healthy:
                     self.logger.info(
                         "Health check successful",
@@ -106,10 +121,10 @@ class HealthMonitorService(IHealthMonitor):
                         status_code=response.status_code,
                         response_time=f"{response_time:.4f}s",
                     )
-                
+
                 return result
-                
-        except httpx.TimeoutException as exc:
+
+        except httpx.TimeoutException:
             response_time = (datetime.now() - start_time).total_seconds()
             result = HealthCheckResult(
                 is_healthy=False,
@@ -124,7 +139,7 @@ class HealthMonitorService(IHealthMonitor):
                 exc_info=True,
             )
             return result
-            
+
         except httpx.RequestError as exc:
             response_time = (datetime.now() - start_time).total_seconds()
             result = HealthCheckResult(
@@ -141,7 +156,7 @@ class HealthMonitorService(IHealthMonitor):
                 exc_info=True,
             )
             return result
-            
+
         except Exception as exc:
             response_time = (datetime.now() - start_time).total_seconds()
             result = HealthCheckResult(
@@ -158,4 +173,3 @@ class HealthMonitorService(IHealthMonitor):
                 exc_info=True,
             )
             return result
-

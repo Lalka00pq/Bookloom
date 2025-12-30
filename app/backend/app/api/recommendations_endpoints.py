@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException
-
+# project
 from app.core.graph import graph_instance
 from app.core.logging import get_logger
 from app.core.recommendation_service import (
@@ -11,6 +10,9 @@ from app.schemas.recommendations import (
     UserRecommendationsRequest,
 )
 
+# 3rd party
+from fastapi import APIRouter, HTTPException
+
 router = APIRouter()
 logger = get_logger(__name__)
 
@@ -20,14 +22,13 @@ recommendation_service: IRecommendationService = GeminiRecommendationService()
 @router.post(
     "/recommendations",
     response_model=RecommendationsResponse,
-    summary="Получить рекомендации книг на основе графа пользователя",
+    summary="Getting recommendations for user",
 )
 async def get_user_recommendations(
     request: UserRecommendationsRequest,
 ) -> RecommendationsResponse:
     """
-    Проанализировать граф прочитанных книг пользователя и получить рекомендации
-    от модели Google Gemini.
+    Analysis of user's graph to get recommendations for him
     """
     logger.info(
         "Generating recommendations for user",
@@ -36,7 +37,7 @@ async def get_user_recommendations(
     )
 
     try:
-        # Получаем актуальное состояние графа из единого инстанса
+        # Get graph state from instance
         graph = graph_instance.show_graph()
 
         recommendations = await recommendation_service.get_recommendations(
@@ -53,7 +54,6 @@ async def get_user_recommendations(
 
         return recommendations
     except HTTPException:
-        # Пробрасываем HTTP-исключения как есть
         raise
     except Exception as exc:
         logger.error(

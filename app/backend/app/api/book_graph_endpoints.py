@@ -1,10 +1,10 @@
-"""Endpoints for managing books in the user's graph."""
-from fastapi import APIRouter, HTTPException
-
+# project
 from app.core.graph import graph_instance
 from app.core.logging import get_logger
 from app.schemas.books_search import BookSearchItem
 from app.schemas.graph import Node
+# 3rd party
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 logger = get_logger(__name__)

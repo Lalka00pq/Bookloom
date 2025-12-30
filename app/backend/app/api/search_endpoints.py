@@ -1,6 +1,4 @@
-from fastapi import APIRouter, HTTPException
-import httpx
-
+# project
 from app.core.config import ApiBooksSettings
 from app.core.logging import get_logger
 from app.schemas.books_search import (
@@ -8,6 +6,11 @@ from app.schemas.books_search import (
     BookSearchItem,
     BookSearchResponse,
 )
+
+# 3rd party
+from fastapi import APIRouter, HTTPException
+import httpx
+
 
 router = APIRouter()
 logger = get_logger(__name__)

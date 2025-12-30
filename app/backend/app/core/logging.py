@@ -1,8 +1,9 @@
-"""Logging configuration using structlog with JSON format and daily rotation."""
+# python
 import logging
 import logging.handlers
 from pathlib import Path
 
+# 3rd party
 import structlog
 from structlog.stdlib import ProcessorFormatter
 from structlog.types import EventDict, Processor
@@ -40,7 +41,8 @@ def setup_logging(log_dir: str = "logs") -> None:
 
     # Configure structlog to work with standard library logging
     structlog.configure(
-        processors=shared_processors + [structlog.stdlib.ProcessorFormatter.wrap_for_formatter],
+        processors=shared_processors +
+        [structlog.stdlib.ProcessorFormatter.wrap_for_formatter],
         wrapper_class=structlog.stdlib.BoundLogger,
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -80,4 +82,3 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
         Configured structlog logger
     """
     return structlog.get_logger(name)
-
