@@ -36,13 +36,11 @@ export function GraphField({
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(300, rect.width - 16), // Учитываем padding
-          height: Math.max(350, rect.height - 80), // Минимальная высота 350px
+          width: Math.max(300, rect.width - 16),
+          height: Math.max(350, rect.height - 80), 
         });
       }
     };
-
-    // Задержка для правильного расчета размеров после монтирования
     const timeoutId = setTimeout(updateDimensions, 100);
     updateDimensions();
     
@@ -64,7 +62,7 @@ export function GraphField({
         </div>
         {onNodeEdit && (
           <p className="text-[10px] text-gray-500 font-mono hidden sm:block">
-            ПКМ для редактирования
+            Right-click a book node to edit its description
           </p>
         )}
       </header>
@@ -101,11 +99,9 @@ export function GraphField({
             }
           }}
           onNodeRightClick={(node: any) => {
-            // Правый клик - редактирование
             if (node.kind === "book" && onNodeEdit) {
               const graphNode = graphData.nodes.find((n) => n.id === node.id);
               if (graphNode) {
-                // Преобразуем GraphNode в Node для модального окна
                 const nodeForEdit: Node = {
                   id: graphNode.id,
                   label: graphNode.label,

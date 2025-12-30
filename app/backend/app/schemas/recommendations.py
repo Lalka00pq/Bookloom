@@ -10,7 +10,7 @@ class UserRecommendationsRequest(BaseModel):
 
     user_id: str = Field(..., description="User identifier")
     limit: int = Field(
-        default=10,
+        default=3,
         ge=1,
         le=100,
         description="Max number of recommendations",

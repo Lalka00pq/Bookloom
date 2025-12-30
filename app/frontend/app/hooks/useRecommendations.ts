@@ -31,7 +31,6 @@ export function useRecommendations(
   const [error, setError] = useState<string | null>(null);
   const [rawData, setRawData] = useState<any>(null);
 
-  // Инициализируем pipeline с трансформером, фильтрами и сортировщиком
   const pipeline = useMemo(() => {
     return new RecommendationPipeline(
       new DefaultRecommendationTransformer(),
@@ -51,10 +50,8 @@ export function useRecommendations(
           limit,
         });
 
-      // Сохраняем сырые данные для отладки
       setRawData(response);
 
-      // Обрабатываем данные через pipeline
       const transformed = pipeline.process(response.recommendations);
       setRecommendations(transformed);
     } catch (err) {
@@ -85,6 +82,6 @@ export function useRecommendations(
     error,
     fetchRecommendations,
     clearRecommendations,
-    rawData, // для отладки
+    rawData, 
   };
 }

@@ -1,7 +1,3 @@
-/**
- * Кэш для рекомендаций
- * Позволяет избежать повторных запросов для одного и того же графа
- */
 
 import type { Recommendation } from "../types";
 
@@ -18,9 +14,7 @@ export interface RecommendationCache {
   isExpired(entry: CacheEntry, ttlMs: number): boolean;
 }
 
-/**
- * In-memory кэш рекомендаций с TTL
- */
+
 export class InMemoryRecommendationCache implements RecommendationCache {
   private cache = new Map<string, CacheEntry>();
   private readonly maxSize: number;
@@ -34,7 +28,6 @@ export class InMemoryRecommendationCache implements RecommendationCache {
   }
 
   set(key: string, value: CacheEntry): void {
-    // Если кэш переполнен, удаляем самую старую запись
     if (this.cache.size >= this.maxSize) {
       const oldestKey = Array.from(this.cache.entries()).sort(
         ([, a], [, b]) => a.timestamp - b.timestamp
@@ -57,10 +50,7 @@ export class InMemoryRecommendationCache implements RecommendationCache {
   }
 }
 
-/**
- * Функция для генерации хеша графа
- * Используется как ключ кэша
- */
+
 export function generateGraphHash(nodes: any[]): string {
   const ids = nodes.map((n) => n.id).sort().join(",");
   // Простой хеш на основе длины и первого/последнего элемента

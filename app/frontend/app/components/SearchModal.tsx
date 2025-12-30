@@ -25,7 +25,7 @@ export function SearchModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Закрытие по Escape
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -36,7 +36,7 @@ export function SearchModal({
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  // Поиск книг при открытии модального окна
+
   useEffect(() => {
     if (isOpen && searchQuery.trim()) {
       performSearch();
@@ -62,11 +62,11 @@ export function SearchModal({
       if (err instanceof ApiError) {
         setError(
           err.statusCode === 502
-            ? "Ошибка подключения к Google Books API"
+            ? "Error connecting to book data source"
             : err.message,
         );
       } else {
-        setError("Произошла ошибка при поиске книг");
+        setError("Error searching books");
       }
       setSearchResults([]);
     } finally {
@@ -113,7 +113,7 @@ export function SearchModal({
         <div className="panel-scroll flex-1 overflow-y-auto pr-2 space-y-3">
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-sm text-gray-400 font-mono">Поиск книг...</p>
+              <p className="text-sm text-gray-400 font-mono">Searching books...</p>
             </div>
           ) : error ? (
             <div className="text-center py-8">
@@ -123,8 +123,8 @@ export function SearchModal({
             <div className="text-center py-8">
               <p className="text-sm text-gray-500 font-mono">
                 {searchQuery.trim()
-                  ? `Книги не найдены для "${searchQuery}"`
-                  : "Введите название книги для поиска"}
+                  ? `Books not found for "${searchQuery}"`
+                  : "Enter a book title to search"}
               </p>
             </div>
           ) : (
@@ -184,12 +184,12 @@ export function SearchModal({
                       {isAlreadyAdded ? (
                         <>
                           <X className="h-4 w-4" />
-                          <span className="hidden sm:inline">Добавлено</span>
+                          <span className="hidden sm:inline">Added</span>
                         </>
                       ) : (
                         <>
                           <Plus className="h-4 w-4" />
-                          <span className="hidden sm:inline">Добавить в граф</span>
+                          <span className="hidden sm:inline">Add to Graph</span>
                         </>
                       )}
                     </button>
@@ -203,7 +203,7 @@ export function SearchModal({
         {/* Footer */}
         {!isLoading && !error && searchResults.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#00fff7]/20 text-xs text-gray-500 font-mono text-center">
-            Найдено книг: {searchResults.length}
+            Found books: {searchResults.length}
           </div>
         )}
       </div>

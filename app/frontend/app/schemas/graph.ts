@@ -1,4 +1,4 @@
-// Схемы для работы с графом (аналогично backend/app/schemas/graph.py)
+
 
 export interface Node {
   id: string;

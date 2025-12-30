@@ -45,8 +45,8 @@ export function EditBookModal({
       await onSave(node.id, description);
       onClose();
     } catch (error) {
-      console.error("Ошибка при сохранении:", error);
-      alert("Произошла ошибка при сохранении описания");
+      console.error("Error saving description:", error);
+      alert("Error saving description. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -67,7 +67,7 @@ export function EditBookModal({
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-white font-mono uppercase tracking-wider">
-              Редактировать описание
+              Edit Book Description
             </h2>
           </div>
           <button
@@ -92,7 +92,7 @@ export function EditBookModal({
         {/* Description Editor */}
         <div className="flex-1 flex flex-col mb-4">
           <label className="text-xs text-gray-400 font-mono mb-2">
-            Описание:
+            Description:
           </label>
           <textarea
             value={description}
@@ -110,7 +110,7 @@ export function EditBookModal({
             className="btn-neon px-4 py-2 rounded font-mono text-xs"
             disabled={isSaving}
           >
-            Отмена
+            Cancel
           </button>
           <button
             onClick={handleSave}

@@ -1,8 +1,4 @@
-/**
- * Сервис для трансформации рекомендаций
- * Отделяет бизнес-логику преобразования данных от компонентов
- * Принцип SOLID: Single Responsibility, Dependency Inversion
- */
+
 
 import type { Recommendation } from "../types";
 import type { BookRecommendation } from "../schemas/recommendations";
@@ -11,9 +7,6 @@ export interface RecommendationTransformer {
   transform(items: BookRecommendation[]): Recommendation[];
 }
 
-/**
- * Стандартный трансформер рекомендаций из backend формата в UI формат
- */
 export class DefaultRecommendationTransformer
   implements RecommendationTransformer
 {
@@ -30,17 +23,10 @@ export class DefaultRecommendationTransformer
   }
 }
 
-/**
- * Фильтр для рекомендаций
- * Позволяет фильтровать рекомендации по различным критериям
- */
 export interface RecommendationFilter {
   apply(recommendations: Recommendation[]): Recommendation[];
 }
 
-/**
- * Фильтр по минимальному score
- */
 export class MinScoreFilter implements RecommendationFilter {
   constructor(private minScore: number = 0.5) {}
 
@@ -49,9 +35,6 @@ export class MinScoreFilter implements RecommendationFilter {
   }
 }
 
-/**
- * Фильтр по жанру
- */
 export class GenreFilter implements RecommendationFilter {
   constructor(private genre: string) {}
 
@@ -60,16 +43,10 @@ export class GenreFilter implements RecommendationFilter {
   }
 }
 
-/**
- * Сортировщик рекомендаций
- */
 export interface RecommendationSorter {
   sort(recommendations: Recommendation[]): Recommendation[];
 }
 
-/**
- * Сортировка по score в убывающем порядке
- */
 export class ScoreSorter implements RecommendationSorter {
   sort(recommendations: Recommendation[]): Recommendation[] {
     return [...recommendations].sort(
@@ -78,10 +55,6 @@ export class ScoreSorter implements RecommendationSorter {
   }
 }
 
-/**
- * Конвейер обработки рекомендаций
- * Применяет трансформацию, фильтрацию и сортировку
- */
 export class RecommendationPipeline {
   constructor(
     private transformer: RecommendationTransformer,
@@ -90,15 +63,15 @@ export class RecommendationPipeline {
   ) {}
 
   process(items: BookRecommendation[]): Recommendation[] {
-    // 1. Трансформируем данные
+    
     let results = this.transformer.transform(items);
 
-    // 2. Применяем фильтры
+    
     for (const filter of this.filters) {
       results = filter.apply(results);
     }
 
-    // 3. Сортируем
+    
     if (this.sorter) {
       results = this.sorter.sort(results);
     }

@@ -19,10 +19,7 @@ export function useHealthCheck(checkInterval: number = 30000) {
   };
 
   useEffect(() => {
-    // Первая проверка сразу
     checkHealth();
-
-    // Периодическая проверка
     const interval = setInterval(checkHealth, checkInterval);
 
     return () => clearInterval(interval);

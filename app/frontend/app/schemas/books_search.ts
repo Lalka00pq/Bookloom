@@ -1,4 +1,3 @@
-// Схемы для поиска книг (аналогично backend/app/schemas/books_search.py)
 
 export interface BookSearchRequest {
   query: string;

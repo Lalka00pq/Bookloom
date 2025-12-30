@@ -34,7 +34,7 @@ export function Header({
         </div>
         <div>
           <h1 className="text-lg font-bold text-white font-mono tracking-wider sm:text-xl">
-            BookGraph
+            BookLoom
           </h1>
           <p className="text-xs text-gray-400 font-mono">
             Discover hidden connections in your reading

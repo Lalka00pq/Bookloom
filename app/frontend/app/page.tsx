@@ -14,13 +14,11 @@ import { booksGraphApi, graphApi, ApiError } from "./utils/api";
 import type { Book, Recommendation } from "./types";
 import type { BookSearchItem } from "./schemas/books_search";
 
-// Начальный список книг пустой - книги будут добавляться из графа
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  // Проверка здоровья backend
   const { isHealthy, isChecking } = useHealthCheck();
 
   const {
@@ -54,7 +52,6 @@ export default function Page() {
         progress: 0,
       }));
 
-    // Обновляем книги только если они изменились
     const existingBookIds = new Set(books.map((b) => b.id));
     booksFromGraph.forEach((book) => {
       if (!existingBookIds.has(book.id)) {
@@ -77,10 +74,10 @@ export default function Page() {
 
   const handleAddBook = async (book: BookSearchItem) => {
     try {
-      // Добавляем книгу в граф через backend API
+      
       await booksGraphApi.addToGraph(book);
       
-      // Обновляем локальное состояние
+
       const bookForState: Book = {
         id: book.code,
         title: book.title,
@@ -91,18 +88,18 @@ export default function Page() {
       };
       addBook(bookForState);
       
-      // Обновляем граф из backend
+
       refreshGraph();
       
       setIsSearchModalOpen(false);
       setSearchQuery("");
     } catch (error) {
       if (error instanceof ApiError) {
-        console.error("Ошибка при добавлении книги в граф:", error.message);
+        console.error("Error adding book:", error.message);
         alert(`Ошибка: ${error.message}`);
       } else {
-        console.error("Неизвестная ошибка:", error);
-        alert("Произошла ошибка при добавлении книги");
+        console.error("Unexpected error:", error);
+        alert("Error adding book. Please try again.");
       }
     }
   };
@@ -116,7 +113,7 @@ export default function Page() {
         {!isChecking && isHealthy === false && (
           <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
             <p className="text-sm text-red-300 font-mono">
-              ⚠️ Сервис временно недоступен. Пожалуйста, проверьте подключение к backend.
+              ⚠️ Service is temporarily unavailable. Please try again later.
             </p>
           </div>
         )}
@@ -130,7 +127,7 @@ export default function Page() {
           isGraphEmpty={graphData.nodes.length === 0}
         />
 
-        {/* Main layout - адаптивная сетка */}
+        {/* Main layout*/}
         <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(200px,280px)_1fr_minmax(200px,280px)] xl:grid-cols-[minmax(250px,320px)_1fr_minmax(250px,320px)]">
           <LibraryPanel
             books={filteredBooks}
@@ -142,10 +139,10 @@ export default function Page() {
             graphData={graphData}
             activeBook={activeBook}
             onNodeClick={(nodeId) => {
-              // Находим узел в графе по его ID
+
               const node = graphData.nodes.find((n) => n.id === nodeId);
               if (node && node.properties?.code) {
-                // Используем code из properties для поиска книги
+
                 const book = books.find((b) => b.id === node.properties.code);
                 if (book) {
                   setActiveBookId(book.id);
@@ -154,13 +151,13 @@ export default function Page() {
             }}
             onNodeEdit={async (nodeId, newDescription) => {
               try {
-                // Находим узел в графе по его ID
+                
                 const node = graphData.nodes.find((n) => n.id === nodeId);
                 if (!node) {
                   throw new Error("Узел не найден");
                 }
 
-                // Обновляем описание через backend API
+
                 await graphApi.changeNode(nodeId, {
                   label: node.label,
                   properties: {
@@ -169,7 +166,7 @@ export default function Page() {
                   },
                 });
 
-                // Обновляем граф (это также обновит локальное состояние книг через useEffect)
+                
                 await refreshGraph();
               } catch (error) {
                 if (error instanceof ApiError) {

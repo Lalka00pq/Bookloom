@@ -17,7 +17,6 @@ export function useGraph() {
       setError(null);
       const graph: Graph = await graphApi.showGraph();
       
-      // Преобразуем данные графа из backend в формат для визуализации
       const nodes = graph.nodes.map((node: Node) => ({
         id: node.id,
         label: node.label,
@@ -33,7 +32,7 @@ export function useGraph() {
 
       setGraphData({ nodes, links });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ошибка загрузки графа");
+      setError(err instanceof Error ? err.message : "Error loading graph");
       setGraphData({ nodes: [], links: [] });
     } finally {
       setIsLoading(false);
