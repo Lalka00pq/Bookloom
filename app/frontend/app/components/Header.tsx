@@ -8,6 +8,7 @@ interface HeaderProps {
   onSearch: () => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
+  isGraphEmpty?: boolean;
 }
 
 export function Header({
@@ -16,6 +17,7 @@ export function Header({
   onSearch,
   onAnalyze,
   isAnalyzing,
+  isGraphEmpty = true,
 }: HeaderProps) {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -64,11 +66,14 @@ export function Header({
         <button
           type="button"
           onClick={onAnalyze}
-          disabled={isAnalyzing}
-          className="btn-neon inline-flex items-center gap-2 px-3 py-2 rounded sm:px-4 disabled:opacity-70 disabled:cursor-wait"
+          disabled={isAnalyzing || isGraphEmpty}
+          className="btn-neon inline-flex items-center gap-2 px-3 py-2 rounded sm:px-4 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          title={isGraphEmpty ? "Add books to your library first" : "Analyze your reading patterns"}
         >
           <Cpu className="h-4 w-4" />
-          <span className="font-mono text-xs hidden sm:inline">Analies</span>
+          <span className="font-mono text-xs hidden sm:inline">
+            {isAnalyzing ? "Analyzing..." : "Analyze"}
+          </span>
         </button>
       </div>
     </header>

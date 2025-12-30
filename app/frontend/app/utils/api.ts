@@ -122,5 +122,19 @@ export const graphApi = {
   },
 };
 
+export const recommendationsApi = {
+  getRecommendations: async (
+    request: import("../schemas/recommendations").UserRecommendationsRequest,
+  ): Promise<import("../schemas/recommendations").RecommendationsResponse> => {
+    return fetchApi<import("../schemas/recommendations").RecommendationsResponse>(
+      "/analytics/recommendations",
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      },
+    );
+  },
+};
+
 export { ApiError };
 

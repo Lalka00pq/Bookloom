@@ -9,43 +9,16 @@ import { SearchModal } from "./components/SearchModal";
 import { useBooks } from "./hooks/useBooks";
 import { useGraph } from "./hooks/useGraph";
 import { useHealthCheck } from "./hooks/useHealthCheck";
+import { useRecommendations } from "./hooks/useRecommendations";
 import { booksGraphApi, graphApi, ApiError } from "./utils/api";
 import type { Book, Recommendation } from "./types";
 import type { BookSearchItem } from "./schemas/books_search";
 
 // Начальный список книг пустой - книги будут добавляться из графа
 
-const MOCK_RECOMMENDATIONS: Recommendation[] = [
-  {
-    id: "r1",
-    title: "Дом странных детей",
-    author: "Рэнсом Риггз",
-    reason:
-      "Тебя притягивает мрачная атмосфера и истории о памяти. Эта книга развивает мотивы ухода от реальности и семейных тайн.",
-    matchScore: 0.86,
-  },
-  {
-    id: "r2",
-    title: "Невыносимая лёгкость бытия",
-    author: "Милан Кундера",
-    reason:
-      "Тебе близки философские романы о свободе и выборе. Мотивы сомнения и исторической травмы перекликаются с твоим чтением.",
-    matchScore: 0.79,
-  },
-  {
-    id: "r3",
-    title: "Океан в конце дороги",
-    author: "Нил Гейман",
-    reason:
-      "Ты любишь магический реализм и мягкую, почти сказочную мрачность. Этот роман превращает детские воспоминания в мифологию.",
-    matchScore: 0.74,
-  },
-];
-
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Проверка здоровья backend
   const { isHealthy, isChecking } = useHealthCheck();
@@ -60,6 +33,9 @@ export default function Page() {
   } = useBooks([]);
 
   const { graphData, refreshGraph } = useGraph();
+  const { recommendations, isLoading: isLoadingRecs, error: recsError, fetchRecommendations, clearRecommendations } = useRecommendations({
+    limit: 10,
+  });
 
   // Синхронизация книг из графа с локальным состоянием
   useEffect(() => {
@@ -94,12 +70,9 @@ export default function Page() {
     }
   };
 
-  const handleAnalyze = () => {
-    if (isAnalyzing) return;
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-    }, 2200);
+  const handleAnalyze = async () => {
+    if (graphData.nodes.length === 0) return;
+    await fetchRecommendations();
   };
 
   const handleAddBook = async (book: BookSearchItem) => {
@@ -153,7 +126,8 @@ export default function Page() {
           onQueryChange={setSearchQuery}
           onSearch={handleSearch}
           onAnalyze={handleAnalyze}
-          isAnalyzing={isAnalyzing}
+          isAnalyzing={isLoadingRecs}
+          isGraphEmpty={graphData.nodes.length === 0}
         />
 
         {/* Main layout - адаптивная сетка */}
@@ -206,7 +180,12 @@ export default function Page() {
             }}
           />
 
-          <RecommendationsPanel recommendations={MOCK_RECOMMENDATIONS} />
+          <RecommendationsPanel
+            recommendations={recommendations}
+            isLoading={isLoadingRecs}
+            error={recsError}
+            isEmpty={graphData.nodes.length === 0}
+          />
         </section>
       </div>
 
@@ -221,22 +200,6 @@ export default function Page() {
         existingBookCodes={new Set(books.map((b) => b.id))}
         onAddBook={handleAddBook}
       />
-
-      {/* Loading overlay for analysis */}
-      {isAnalyzing && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="panel-cyber p-6 rounded-lg max-w-sm text-center">
-            <div className="mb-4 flex items-center justify-center gap-2">
-              <span className="text-sm font-mono text-white uppercase tracking-wider">
-                Analyzing...
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 font-mono">
-              Processing connections and generating recommendations
-            </p>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
