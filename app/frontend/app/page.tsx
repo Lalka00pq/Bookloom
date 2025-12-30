@@ -35,14 +35,13 @@ export default function Page() {
     limit: 10,
   });
 
-  // Синхронизация книг из графа с локальным состоянием
   useEffect(() => {
     const booksFromGraph: Book[] = graphData.nodes
       .filter((node) => node.kind === "book" && node.properties?.code)
       .map((node) => ({
-        id: node.properties.code as string,
+        id: (node.properties?.code as string) || "",
         title: node.label,
-        author: (node.properties?.author as string) || "Автор не указан",
+        author: (node.properties?.author as string) || "Unknown",
         year: node.properties?.published
           ? parseInt(
               (node.properties.published as string).split("-")[0] || "0",
@@ -143,7 +142,7 @@ export default function Page() {
               const node = graphData.nodes.find((n) => n.id === nodeId);
               if (node && node.properties?.code) {
 
-                const book = books.find((b) => b.id === node.properties.code);
+                const book = books.find((b) => b.id === node.properties?.code);
                 if (book) {
                   setActiveBookId(book.id);
                 }

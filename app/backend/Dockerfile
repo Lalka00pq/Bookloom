@@ -16,5 +16,8 @@ COPY . .
 
 EXPOSE 8000
 
+# Allow container port to be configured at runtime via PORT env var
+ENV PORT=8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use shell form so environment variable substitution works at runtime
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]

@@ -41,9 +41,14 @@ export function GraphField({
         });
       }
     };
-    const timeoutId = setTimeout(updateDimensions, 100);
-    updateDimensions();
-    
+
+    const timeoutId = setTimeout(() => {
+      updateDimensions();
+      if (graphRef.current) {
+        graphRef.current.zoom(0.7);
+      }
+    }, 100);
+
     window.addEventListener("resize", updateDimensions);
     return () => {
       clearTimeout(timeoutId);
@@ -89,12 +94,10 @@ export function GraphField({
           linkDirectionalParticleWidth={2}
           nodeRelSize={5}
           cooldownTicks={50}
-          zoom={0.7}
           minZoom={0.2}
           maxZoom={2.5}
           onNodeClick={(node: any) => {
             if (node.kind === "book") {
-              
               onNodeClick(node.id as string);
             }
           }}
@@ -130,7 +133,6 @@ export function GraphField({
             const radius = isBook ? 7 : 4;
             const mainColor = isBook ? "#00fff7" : "#ff00ff";
 
-            // Glow effect
             const gradientRadius = Math.max(
               isActive ? radius * 5 : radius * 3.5,
               radius + 2,
@@ -156,7 +158,6 @@ export function GraphField({
             ctx.arc(node.x, node.y, gradientRadius, 0, 2 * Math.PI, false);
             ctx.fill();
 
-            // Node core
             ctx.beginPath();
             ctx.fillStyle = mainColor;
             ctx.strokeStyle = isActive ? "#ffffff" : "#000000";
@@ -165,7 +166,6 @@ export function GraphField({
             ctx.fill();
             ctx.stroke();
 
-            // Label
             ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
@@ -178,7 +178,6 @@ export function GraphField({
         />
       </div>
 
-      {/* Edit Book Modal */}
       {selectedNode && onNodeEdit && (
         <EditBookModal
           isOpen={selectedNodeId !== null}
@@ -197,4 +196,3 @@ export function GraphField({
     </section>
   );
 }
-
