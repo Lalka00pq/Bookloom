@@ -85,7 +85,7 @@ export function EditBookModal({
             {node.label}
           </h3>
           <p className="text-xs text-gray-400 font-mono">
-            {node.properties?.author || "Автор не указан"}
+            {node.properties?.author || "Unknown Author"}
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export function EditBookModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="flex-1 terminal-input rounded p-3 text-sm text-white placeholder:text-gray-500 font-mono focus:outline-none focus:border-[#00fff7] resize-none"
-            placeholder="Введите описание книги..."
+            placeholder="Enter description..."
             rows={10}
           />
         </div>
@@ -118,7 +118,7 @@ export function EditBookModal({
             className="btn-neon px-4 py-2 rounded flex items-center gap-2 font-mono text-xs disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
-            {isSaving ? "Сохранение..." : "Сохранить"}
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

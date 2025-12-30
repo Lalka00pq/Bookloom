@@ -114,8 +114,8 @@ class GeminiRecommendationService(IRecommendationService):
                 "    }\n"
                 "  ]\n"
                 "}\n\n"
-                f"Max number of recommendations: {limit}."
-            ),
+                "YOU MUST RETURN ONLY 3 (not less and not more) RECOMMENDATIONS IN JSON."
+            ),  # TODO Проблема в лимите рекомендаций
             "user_id": user_id,
             "graph": graph_payload,
         }
