@@ -1,10 +1,30 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Book } from "../types";
 
 export function useBooks(initialBooks: Book[]) {
-  const [books, setBooks] = useState<Book[]>(initialBooks);
+  const STORAGE_KEY = "user_books";
+
+  const getInitialBooks = (): Book[] => {
+    try {
+      if (typeof window === "undefined") return initialBooks;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return initialBooks;
+      const parsed = JSON.parse(raw) as Book[];
+      return Array.isArray(parsed) ? parsed : initialBooks;
+    } catch {
+      return initialBooks;
+    }
+  };
+
+  const [books, setBooks] = useState<Book[]>(getInitialBooks);
+
+  const getInitialActiveId = (): string | null => {
+    const b = getInitialBooks();
+    return b[0]?.id ?? null;
+  };
+
   const [activeBookId, setActiveBookId] = useState<string | null>(
-    initialBooks[0]?.id ?? null,
+    getInitialActiveId(),
   );
 
   const activeBook = useMemo(
@@ -38,6 +58,16 @@ export function useBooks(initialBooks: Book[]) {
         book.tags.some((t) => t.toLowerCase().includes(q)),
     );
   };
+
+  // Persist books to localStorage on change (guarded for SSR)
+  useEffect(() => {
+    try {
+      if (typeof window === "undefined") return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+    } catch {
+      // ignore storage errors
+    }
+  }, [books]);
 
   return {
     books,

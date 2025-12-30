@@ -94,7 +94,7 @@ export function GraphField({
           maxZoom={2.5}
           onNodeClick={(node: any) => {
             if (node.kind === "book") {
-              // Обычный клик - выбор книги
+              
               onNodeClick(node.id as string);
             }
           }}

@@ -41,9 +41,7 @@ export function useGraph() {
 
   useEffect(() => {
     loadGraph();
-    
-    const interval = setInterval(loadGraph, 5000);
-    return () => clearInterval(interval);
+    return () => {};
   }, [loadGraph]);
 
   return {
