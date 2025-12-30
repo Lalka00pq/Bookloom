@@ -59,9 +59,8 @@ class GeminiRecommendationService(IRecommendationService):
 
         url = (
             f"{self._settings.api_url}/"
-            f"{self._settings.model_name}:generateContent"
+            f"{self._settings.model_name}:generateContent?key={self._settings.api_key}"
         )
-        params = {"key": self._settings.api_key}
         payload = {
             "contents": [
                 {
@@ -75,7 +74,7 @@ class GeminiRecommendationService(IRecommendationService):
         }
 
         async with httpx.AsyncClient(timeout=self._settings.timeout) as client:
-            response = await client.post(url, params=params, json=payload)
+            response = await client.post(url, json=payload)
             response.raise_for_status()
             data = response.json()
 

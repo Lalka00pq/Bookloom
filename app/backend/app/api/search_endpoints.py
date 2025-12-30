@@ -46,12 +46,15 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
     params = {
         "q": request.query,
         "maxResults": request.max_results,
-        "key": api_books_settings.API_BOOKS_KEY,
     }
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(api_books_settings.API_BOOKS_URL, params=params)
+            response = await client.get(
+                api_books_settings.API_BOOKS_URL,
+                params=params,
+                headers={"X-API-Key": api_books_settings.API_BOOKS_KEY},
+            )
     except httpx.RequestError as exc:
         logger.error(
             "Error connecting to Google Books API",
