@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react"; // 1. Добавляем хуки
 import { TrendingUp, AlertCircle, Loader } from "lucide-react";
 import type { Recommendation } from "../types";
 
@@ -16,6 +17,30 @@ export function RecommendationsPanel({
   error = null,
   isEmpty = false,
 }: RecommendationsPanelProps) {
+  // 2. Добавляем проверку монтирования
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 3. Пока компонент не "ожил" в браузере, возвращаем структуру, 
+  // максимально близкую к серверной, либо просто пустую панель.
+  if (!mounted) {
+    return (
+      <aside className="panel-cyber-magenta rounded-lg p-3 sm:p-4 flex flex-col min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
+        <header className="mb-3 sm:mb-4 flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff00ff]" />
+          <h2 className="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider">
+            Recommendations
+          </h2>
+        </header>
+        <div className="flex-1" />
+      </aside>
+    );
+  }
+
+  // 4. Основная логика теперь работает только после того, как mounted === true
   return (
     <aside className="panel-cyber-magenta rounded-lg p-3 sm:p-4 flex flex-col min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
       <header className="mb-3 sm:mb-4 flex items-center gap-2">
@@ -95,4 +120,3 @@ export function RecommendationsPanel({
     </aside>
   );
 }
-
