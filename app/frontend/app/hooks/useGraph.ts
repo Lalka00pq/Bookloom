@@ -4,10 +4,22 @@ import type { Graph, Node } from "../schemas/graph";
 import { graphApi } from "../utils/api";
 
 export function useGraph() {
-  const [graphData, setGraphData] = useState<GraphData>({
-    nodes: [],
-    links: [],
-  });
+  const STORAGE_KEY = "graph_data";
+
+  const getInitialGraph = (): GraphData => {
+    try {
+      if (typeof window === "undefined") return { nodes: [], links: [] };
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { nodes: [], links: [] };
+      const parsed = JSON.parse(raw) as GraphData;
+      if (parsed.nodes && Array.isArray(parsed.nodes)) return parsed;
+      return { nodes: [], links: [] };
+    } catch {
+      return { nodes: [], links: [] };
+    }
+  };
+
+  const [graphData, setGraphData] = useState<GraphData>(getInitialGraph);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +42,16 @@ export function useGraph() {
         kind: "similar-theme" as const,
       }));
 
-      setGraphData({ nodes, links });
+      const newGraphData = { nodes, links };
+      setGraphData(newGraphData);
+      // Сохранить граф в localStorage
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newGraphData));
+        }
+      } catch {
+        // ignore storage errors
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error loading graph");
       setGraphData({ nodes: [], links: [] });

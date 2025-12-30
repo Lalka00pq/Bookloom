@@ -33,7 +33,7 @@ export function useRecommendations(
 
   const STORAGE_KEY = `recommendations_${userId}`;
 
-  // Load cached recommendations from localStorage (if any)
+  // Load cached recommendations from localStorage on mount
   useEffect(() => {
     try {
       if (typeof window === "undefined") return;
