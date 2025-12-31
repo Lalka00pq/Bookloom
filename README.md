@@ -3,7 +3,7 @@
 <div align="center">
 	<!-- Логотип приложения: поместите файл в docs/logo.png или замените ссылку -->
 	<!-- Place application logo at docs/logo.png or replace the link -->
-	<h1 align="center">Bookloom — BookGraph</h1>
+	<h1 align="center">Bookloom</h1>
 	<p align="center">Full‑stack application for visualizing connections between books and providing intelligent recommendations</p>
 </div>
 
