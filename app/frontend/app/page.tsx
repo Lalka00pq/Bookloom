@@ -95,7 +95,7 @@ export default function Page() {
     } catch (error) {
       if (error instanceof ApiError) {
         console.error("Error adding book:", error.message);
-        alert(`Ошибка: ${error.message}`);
+        alert(`Error: ${error.message}`);
       } else {
         console.error("Unexpected error:", error);
         alert("Error adding book. Please try again.");
@@ -108,7 +108,7 @@ export default function Page() {
   return (
     <main className="relative z-10 min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-[1920px]">
-        {/* Сообщение о недоступности backend */}
+        {/* Message about the backend being unavailable */}
         {!isChecking && isHealthy === false && (
           <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
             <p className="text-sm text-red-300 font-mono">
@@ -153,7 +153,7 @@ export default function Page() {
                 
                 const node = graphData.nodes.find((n) => n.id === nodeId);
                 if (!node) {
-                  throw new Error("Узел не найден");
+                  throw new Error("Node not found");
                 }
 
 
