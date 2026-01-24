@@ -12,6 +12,7 @@ from app.api.recommendations_endpoints import router as recommendations_router
 from app.core.logging import setup_logging, get_logger
 from app.core.config import HealthMonitorSettings
 from app.core.health_monitor import HealthMonitorService, IHealthMonitor
+from app.core.graph import graph_instance
 
 # 3rd party
 from fastapi import FastAPI, Request
@@ -68,6 +69,22 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events."""
     # Startup
     logger.info("Application starting")
+
+    # Load graph from storage
+    try:
+        graph_instance.load_from_storage()
+        graph = graph_instance.show_graph()
+        logger.info(
+            "Graph loaded from storage",
+            nodes_count=len(graph.nodes),
+            edges_count=len(graph.edges),
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to load graph from storage during startup",
+            error=str(e),
+            exc_info=True,
+        )
 
     # Start health monitoring background task
     task = None

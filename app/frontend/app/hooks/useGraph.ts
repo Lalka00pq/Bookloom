@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { GraphData } from "../types";
 import type { Graph, Node } from "../schemas/graph";
 import { graphApi } from "../utils/api";
 
 export function useGraph() {
   const STORAGE_KEY = "graph_data";
+  const hasLoadedFromStorageRef = useRef(false);
 
   const getInitialGraph = (): GraphData => {
     try {
@@ -12,7 +13,10 @@ export function useGraph() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return { nodes: [], links: [] };
       const parsed = JSON.parse(raw) as GraphData;
-      if (parsed.nodes && Array.isArray(parsed.nodes)) return parsed;
+      // Улучшенная проверка: граф должен быть не пуст
+      if (parsed.nodes && Array.isArray(parsed.nodes) && parsed.nodes.length > 0) {
+        return parsed;
+      }
       return { nodes: [], links: [] };
     } catch {
       return { nodes: [], links: [] };
@@ -20,7 +24,7 @@ export function useGraph() {
   };
 
   const [graphData, setGraphData] = useState<GraphData>(getInitialGraph);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadGraph = useCallback(async () => {
@@ -50,20 +54,28 @@ export function useGraph() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(newGraphData));
         }
       } catch {
-        // ignore storage errors
+        
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error loading graph");
-      setGraphData({ nodes: [], links: [] });
+      
+      const fallbackData = getInitialGraph();
+      if (fallbackData.nodes.length > 0) {
+        setGraphData(fallbackData);
+      } else {
+        setError(err instanceof Error ? err.message : "Error loading graph");
+        setGraphData({ nodes: [], links: [] });
+      }
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadGraph();
-    return () => {};
-  }, [loadGraph]);
+    if (!hasLoadedFromStorageRef.current) {
+      hasLoadedFromStorageRef.current = true;
+      
+    }
+  }, []);
 
   return {
     graphData,

@@ -1,0 +1,43 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "label": "Neuromancer",
+      "properties": {
+        "code": "Bd_UZAdvUDIC",
+        "title": "Neuromancer",
+        "author": "William Gibson",
+        "published": "2000-07-01",
+        "isbn": "9781101146460",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "Winner of the Hugo, Nebula, and Philip K. Dick Awards, Neuromancer is a science fiction masterpiece—a classic that ranks as one of the twentieth century’s most potent visions of the future. Case was the sharpest data-thief in the matrix—until he crossed the wrong people and they crippled his nervous system, banishing him from cyberspace. Now a mysterious new employer has recruited him for a last-chance run at an unthinkably powerful artificial intelligence. With a dead man riding shotgun and Molly, a mirror-eyed street-samurai, to watch his back, Case is ready for the adventure that upped the ante on an entire genre of fiction. Neuromancer was the first fully-realized glimpse of humankind’s digital future—a shocking vision that has challenged our assumptions about technology and ourselves, reinvented the way we speak and think, and forever altered the landscape of our imaginations.",
+        "cover": "http://books.google.com/books/content?id=Bd_UZAdvUDIC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "2",
+      "label": "Count Zero",
+      "properties": {
+        "code": "7RpZX8mYKVMC",
+        "title": "Count Zero",
+        "author": "William Gibson",
+        "published": "1987-04-01",
+        "isbn": "9781101146477",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "William Gibson continues the visionary Sprawl Trilogy that began with Neuromancer in this frighteningly probable parable of the future. A corporate mercenary wakes in a reconstructed body, a beautiful woman by his side. Then Hosaka Corporation reactivates him, for a mission more dangerous than the one he’s recovering from: to get a defecting chief of R&D—and the biochip he’s perfected—out intact. But this proves to be of supreme interest to certain other parties—some of whom aren’t remotely human....",
+        "cover": "http://books.google.com/books/content?id=7RpZX8mYKVMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2",
+      "weight": 1.0
+    }
+  ]
+}
