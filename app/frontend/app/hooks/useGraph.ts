@@ -73,9 +73,9 @@ export function useGraph() {
   useEffect(() => {
     if (!hasLoadedFromStorageRef.current) {
       hasLoadedFromStorageRef.current = true;
-      
+      loadGraph();
     }
-  }, []);
+  }, [loadGraph]);
 
   return {
     graphData,
