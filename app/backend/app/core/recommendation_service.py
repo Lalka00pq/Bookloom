@@ -3,12 +3,13 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 import httpx
 
 from app.core.config import GeminiSettings
 from app.core.logging import get_logger
+from app.core.recommendations_persistence import RecommendationsPersistenceService
 from app.schemas.graph import Graph
 from app.schemas.recommendations import (
     BookRecommendation,
@@ -33,12 +34,17 @@ class IRecommendationService(ABC):
 
 class GeminiRecommendationService(IRecommendationService):
     """
-    Recommendation service.
+    Recommendation service with persistence (SOLID: DIP - Dependency Inversion).
     """
 
-    def __init__(self, settings: GeminiSettings | None = None) -> None:
+    def __init__(
+        self,
+        settings: Optional[GeminiSettings] = None,
+        persistence_service: Optional[RecommendationsPersistenceService] = None,
+    ) -> None:
         self._settings = settings or GeminiSettings()
         self._logger = get_logger(self.__class__.__name__)
+        self._persistence_service = persistence_service or RecommendationsPersistenceService()
 
     async def get_recommendations(
         self,
@@ -88,6 +94,9 @@ class GeminiRecommendationService(IRecommendationService):
             user_id=user_id,
             recommendations_count=len(recommendations.recommendations),
         )
+
+        # Save recommendations to storage
+        self._save_recommendations(recommendations)
 
         return recommendations
 
@@ -254,3 +263,80 @@ class GeminiRecommendationService(IRecommendationService):
             ]
         }
         return self._parse_response(data=mock_data, user_id=user_id)
+
+    def _save_recommendations(self, recommendations: RecommendationsResponse) -> None:
+        """Save recommendations to storage (SOLID: SRP - persistence is delegated).
+
+        Args:
+            recommendations (RecommendationsResponse): Recommendations to save
+        """
+        try:
+            recommendations_data = self._recommendations_to_dict(
+                recommendations)
+            self._persistence_service.save_recommendations(
+                recommendations_data)
+        except Exception as e:
+            # Log error but don't fail - recommendations are still in memory
+            self._logger.error(
+                "Failed to save recommendations to storage",
+                error=str(e),
+            )
+
+    def _recommendations_to_dict(self, recommendations: RecommendationsResponse) -> dict:
+        """Convert recommendations to dictionary format for storage.
+
+        Args:
+            recommendations (RecommendationsResponse): Recommendations to convert
+
+        Returns:
+            dict: Recommendations data with 'user_id' and 'recommendations' keys
+        """
+        return {
+            "user_id": recommendations.user_id,
+            "recommendations": [
+                {
+                    "book_id": rec.book_id,
+                    "title": rec.title,
+                    "author": rec.author,
+                    "reason": rec.reason,
+                    "score": rec.score,
+                    "metadata": rec.metadata,
+                }
+                for rec in recommendations.recommendations
+            ],
+        }
+
+    def load_saved_recommendations(self) -> RecommendationsResponse:
+        """Load previously saved recommendations from storage.
+
+        Returns:
+            RecommendationsResponse: Loaded recommendations or empty response if none exist
+        """
+        try:
+            data = self._persistence_service.load_recommendations()
+            if not data.get("recommendations"):
+                return RecommendationsResponse(user_id=data.get("user_id", ""), recommendations=[])
+
+            recommendations = []
+            for item in data.get("recommendations", []):
+                try:
+                    recommendations.append(BookRecommendation(**item))
+                except Exception as e:
+                    self._logger.error(
+                        "Failed to parse saved recommendation item",
+                        error=str(e),
+                        item=item,
+                    )
+                    continue
+
+            user_id = data.get("user_id", "")
+            return RecommendationsResponse(
+                user_id=user_id,
+                recommendations=recommendations,
+            )
+        except Exception as e:
+            self._logger.error(
+                "Failed to load recommendations from storage",
+                error=str(e),
+            )
+            return RecommendationsResponse(user_id="", recommendations=[])

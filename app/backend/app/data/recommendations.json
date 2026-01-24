@@ -1,0 +1,56 @@
+{
+  "user_id": "default_user",
+  "recommendations": [
+    {
+      "book_id": null,
+      "title": "Mona Lisa Overdrive",
+      "author": "William Gibson",
+      "reason": "You've read the first two books of William Gibson's Sprawl Trilogy, 'Neuromancer' and 'Count Zero'. 'Mona Lisa Overdrive' is the third and concluding novel, a direct continuation of the story and world you've already enjoyed.",
+      "score": 0.98,
+      "metadata": {
+        "genre": "Cyberpunk",
+        "tags": [
+          "Science Fiction",
+          "Trilogy",
+          "Virtual Reality",
+          "Artificial Intelligence",
+          "Hacking"
+        ]
+      }
+    },
+    {
+      "book_id": "IUA_DwAAQBAJ",
+      "title": "Пикник на обочине (Roadside Picnic)",
+      "author": "Аркадий и Борис Стругацкие",
+      "reason": "This classic science fiction novel, already present in your graph, explores themes of mysterious alien artifacts and zones of altered reality. Its sense of the unknowable and complex, dangerous environments can appeal to readers who enjoyed the intricate and enigmatic world of 'Neuromancer'.",
+      "score": 0.85,
+      "metadata": {
+        "genre": "Science Fiction",
+        "tags": [
+          "Alien Contact",
+          "Mysterious Zone",
+          "Philosophical",
+          "Classic Sci-Fi",
+          "Post-Apocalyptic"
+        ]
+      }
+    },
+    {
+      "book_id": "E5khWQMmrTUC",
+      "title": "Solaris",
+      "author": "Stanisław Lem",
+      "reason": "Also from your graph, 'Solaris' is a profound science fiction classic that delves into the mystery of an alien intelligence (the sentient ocean) and humanity's attempts to comprehend it. This theme of grappling with an unknowable, powerful entity echoes the complex artificial intelligences and cyberspace found in 'Neuromancer'.",
+      "score": 0.82,
+      "metadata": {
+        "genre": "Science Fiction",
+        "tags": [
+          "First Contact",
+          "Alien Intelligence",
+          "Psychological",
+          "Philosophical",
+          "Classic Sci-Fi"
+        ]
+      }
+    }
+  ]
+}

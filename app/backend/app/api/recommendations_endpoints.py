@@ -67,3 +67,44 @@ async def get_user_recommendations(
             status_code=500,
             detail="Failed to generate recommendations",
         ) from exc
+
+
+@router.get(
+    "/recommendations",
+    response_model=RecommendationsResponse,
+    summary="Get saved recommendations",
+    description="Retrieve previously saved recommendations from storage",
+)
+async def get_saved_recommendations() -> RecommendationsResponse:
+    """
+    Get previously saved recommendations from storage.
+
+    This endpoint returns the last set of recommendations that were generated
+    and saved to storage. If no recommendations exist, returns an empty response.
+
+    Returns:
+        RecommendationsResponse: Saved recommendations or empty response
+    """
+    logger.info("Retrieving saved recommendations from storage")
+
+    try:
+        recommendations = recommendation_service.load_saved_recommendations()
+
+        logger.info(
+            "Saved recommendations retrieved",
+            user_id=recommendations.user_id,
+            recommendations_count=len(recommendations.recommendations),
+        )
+
+        return recommendations
+    except Exception as exc:
+        logger.error(
+            "Failed to retrieve saved recommendations",
+            error=str(exc),
+            error_type=type(exc).__name__,
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to retrieve saved recommendations",
+        ) from exc
