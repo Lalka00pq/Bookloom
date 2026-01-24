@@ -21,8 +21,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-# Optional: add a network if you need custom settings
 networks:
   default:
     driver: bridge
