@@ -126,7 +126,6 @@ async def log_requests(request: Request, call_next):
 
     # Get request details
     method = request.method
-    url = str(request.url)
     path = request.url.path
     client_ip = request.client.host if request.client else "unknown"
 
@@ -136,7 +135,6 @@ async def log_requests(request: Request, call_next):
             "Request received",
             method=method,
             path=path,
-            url=url,
             client_ip=client_ip,
         )
 
