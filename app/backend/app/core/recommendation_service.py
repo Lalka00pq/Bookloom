@@ -18,8 +18,6 @@ from app.schemas.recommendations import (
 
 
 class IRecommendationService(ABC):
-    """Интерфейс сервиса рекомендаций (SOLID: ISP + DIP)."""
-
     @abstractmethod
     async def get_recommendations(
         self,
@@ -28,7 +26,6 @@ class IRecommendationService(ABC):
         graph: Graph,
         limit: int,
     ) -> RecommendationsResponse:
-        """Получить рекомендации для пользователя на основе графа."""
         raise NotImplementedError
 
 

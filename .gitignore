@@ -15,3 +15,5 @@ wheels/
 logs/
 *.log
 .idea
+tech.md
+code_analysis_report.md
