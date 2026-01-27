@@ -1,1 +1,13 @@
 .venv
+./images
+.python-version
+.idea
+
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+tech.md
+code_analysis_report.md

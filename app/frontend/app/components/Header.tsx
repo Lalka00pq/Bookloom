@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react"; // 1. Добавляем хуки
+import { useEffect, useState } from "react";
 import { Search, Cpu } from "lucide-react";
 
 interface HeaderProps {
@@ -20,7 +20,7 @@ export function Header({
   isAnalyzing,
   isGraphEmpty = true,
 }: HeaderProps) {
-  // 2. Флаг монтирования
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function Header({
             type="text"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            onKeyDown={handleKeyPress} // Исправлено: onKeyPress устарел, лучше использовать onKeyDown
+            onKeyDown={handleKeyPress}
             placeholder="Search by Title..."
             className="w-full bg-transparent text-sm text-white placeholder:text-gray-500 font-mono focus:outline-none"
           />
