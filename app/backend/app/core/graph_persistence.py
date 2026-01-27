@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional
 
 # project
 from app.core.logging import get_logger
+from app.core.base_json_storage import BaseJsonStorage
 
 
 logger = get_logger(__name__)
@@ -36,7 +37,7 @@ class IGraphStorage(ABC):
         raise NotImplementedError
 
 
-class JsonGraphStorage(IGraphStorage):
+class JsonGraphStorage(BaseJsonStorage, IGraphStorage):
     """JSON file-based graph storage implementation"""
 
     def __init__(self, file_path: Optional[Path] = None) -> None:
@@ -48,17 +49,8 @@ class JsonGraphStorage(IGraphStorage):
         """
         if file_path is None:
             file_path = Path(__file__).parent.parent / "data" / "graph.json"
-
-        self.file_path = Path(file_path)
-        self._ensure_storage_directory()
-
-    def _ensure_storage_directory(self) -> None:
-        """Ensure the storage directory exists."""
-        self.file_path.parent.mkdir(parents=True, exist_ok=True)
-        logger.debug(
-            "Graph storage directory ensured",
-            path=str(self.file_path.parent),
-        )
+        
+        super().__init__(file_path=Path(file_path), entity_name="Graph")
 
     def load_graph(self) -> Dict[str, Any]:
         """Load graph data from JSON file.
@@ -68,47 +60,17 @@ class JsonGraphStorage(IGraphStorage):
         Returns:
             Dict[str, Any]: Graph data with 'nodes' and 'edges' keys
         """
-        try:
-            if not self.file_path.exists():
-                logger.info(
-                    "Graph storage file does not exist, returning empty graph",
-                    path=str(self.file_path),
-                )
-                return {"nodes": [], "edges": []}
-
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-
-            if not content:
-                logger.info(
-                    "Graph storage file is empty, returning empty graph",
-                    path=str(self.file_path),
-                )
-                return {"nodes": [], "edges": []}
-
-            data = json.loads(content)
-            logger.info(
-                "Graph loaded from storage",
-                path=str(self.file_path),
+        data = self._load_json(empty_value={"nodes": [], "edges": []})
+        
+        # Log specific details if data was loaded successfully and is not the empty default
+        # (Technically _load_json already logged generic success or failure)
+        if data and (data.get("nodes") or data.get("edges")):
+             logger.info(
+                "Graph detailed stats",
                 nodes_count=len(data.get("nodes", [])),
                 edges_count=len(data.get("edges", [])),
             )
-            return data
-
-        except json.JSONDecodeError as e:
-            logger.error(
-                "Failed to parse graph JSON file",
-                path=str(self.file_path),
-                error=str(e),
-            )
-            return {"nodes": [], "edges": []}
-        except IOError as e:
-            logger.error(
-                "Failed to read graph file",
-                path=str(self.file_path),
-                error=str(e),
-            )
-            raise
+        return data
 
     def save_graph(self, graph_data: Dict[str, Any]) -> None:
         """Save graph data to JSON file.
@@ -119,27 +81,11 @@ class JsonGraphStorage(IGraphStorage):
         Raises:
             IOError: If write operation fails
         """
-        try:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(graph_data, f, ensure_ascii=False, indent=2)
-
-            logger.info(
-                "Graph saved to storage",
-                path=str(self.file_path),
-                nodes_count=len(graph_data.get("nodes", [])),
-                edges_count=len(graph_data.get("edges", [])),
-            )
-        except IOError as e:
-            logger.error(
-                "Failed to save graph file",
-                path=str(self.file_path),
-                error=str(e),
-            )
-            raise
+        self._save_json(graph_data)
 
 
 class GraphPersistenceService:
-    """Service for managing graph persistence (SOLID: SRP, DIP - Dependency Inversion)."""
+    """Service for managing graph persistence"""
 
     def __init__(self, storage: Optional[IGraphStorage] = None) -> None:
         """Initialize persistence service.

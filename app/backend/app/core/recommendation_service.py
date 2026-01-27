@@ -31,7 +31,7 @@ class IRecommendationService(ABC):
 
 class GeminiRecommendationService(IRecommendationService):
     """
-    Recommendation service with persistence (SOLID: DIP - Dependency Inversion).
+    Recommendation service with persistence
     """
 
     def __init__(
@@ -237,11 +237,9 @@ class GeminiRecommendationService(IRecommendationService):
         """
         Parser Gemini response.
 
-.
-
         Args:
-            raw_text: Сырой текст ответа от Gemini
-            user_id: Идентификатор пользователя
+            raw_text: Gemini response text
+            user_id: User ID
 
         Returns:
             RecommendationsResponse
@@ -262,14 +260,13 @@ class GeminiRecommendationService(IRecommendationService):
         return self._parse_response(data=mock_data, user_id=user_id)
 
     def _save_recommendations(self, recommendations: RecommendationsResponse) -> None:
-        """Save recommendations to storage (SOLID: SRP - persistence is delegated).
+        """Save recommendations to storage
 
         Args:
             recommendations (RecommendationsResponse): Recommendations to save
         """
         try:
-            recommendations_data = self._recommendations_to_dict(
-                recommendations)
+            recommendations_data = recommendations.model_dump()
             self._persistence_service.save_recommendations(
                 recommendations_data)
         except Exception as e:
@@ -279,30 +276,6 @@ class GeminiRecommendationService(IRecommendationService):
                 error=str(e),
             )
 
-    def _recommendations_to_dict(self, recommendations: RecommendationsResponse) -> dict:
-        """Convert recommendations to dictionary format for storage.
-
-        Args:
-            recommendations (RecommendationsResponse): Recommendations to convert
-
-        Returns:
-            dict: Recommendations data with 'user_id' and 'recommendations' keys
-        """
-        return {
-            "user_id": recommendations.user_id,
-            "recommendations": [
-                {
-                    "book_id": rec.book_id,
-                    "title": rec.title,
-                    "author": rec.author,
-                    "reason": rec.reason,
-                    "score": rec.score,
-                    "metadata": rec.metadata,
-                }
-                for rec in recommendations.recommendations
-            ],
-        }
-
     def load_saved_recommendations(self) -> RecommendationsResponse:
         """Load previously saved recommendations from storage.
 
@@ -311,26 +284,10 @@ class GeminiRecommendationService(IRecommendationService):
         """
         try:
             data = self._persistence_service.load_recommendations()
-            if not data.get("recommendations"):
-                return RecommendationsResponse(user_id=data.get("user_id", ""), recommendations=[])
+            if not data or not data.get("recommendations"):
+                return RecommendationsResponse(user_id=data.get("user_id", "") or "", recommendations=[])
 
-            recommendations = []
-            for item in data.get("recommendations", []):
-                try:
-                    recommendations.append(BookRecommendation(**item))
-                except Exception as e:
-                    self._logger.error(
-                        "Failed to parse saved recommendation item",
-                        error=str(e),
-                        item=item,
-                    )
-                    continue
-
-            user_id = data.get("user_id", "")
-            return RecommendationsResponse(
-                user_id=user_id,
-                recommendations=recommendations,
-            )
+            return RecommendationsResponse.model_validate(data)
         except Exception as e:
             self._logger.error(
                 "Failed to load recommendations from storage",
