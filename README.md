@@ -10,20 +10,28 @@
 
 This is a monorepo containing the frontend and backend parts of the BookGraph application. This README provides a concise guide to quickly start the entire stack using Docker Compose.
 
-## Quick start (Docker Compose)
-> [!important]
-> Make sure that you have docker and docker-compose installed on your system.
+## Prerequisites
  - [Docker](https://www.docker.com/get-started/)
  - Docker-compose will be installed automatically with Docker Desktop
-
->[!important] 
->Before starting the services, make sure that you added your environment variables to the `.env` file in backend part. You need to rename the `.env.example` file to `.env` and fill in the values. 
-### Renaming the `.env.example` file to `.env`
+ - Google Books API key
+ - Gemini API key
+## Quick start (Docker Compose)
+1) Clone the repository
+```bash
+git clone https://github.com/Lalka00pq/Bookloom
+```
+2) Go to the repository root
+```bash
+cd Bookloom
+```
+3) Update the environment variables
 ```bash
 cd app/backend/app
-mv .env.example .env
+mv .env-example .env
 ```
-### Start the services
+Fill in the values in the `.env` file, then return to the root directory
+
+4) Start the services
 ```bash
 # from the repository root
 docker-compose up --build
