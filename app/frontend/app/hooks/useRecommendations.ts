@@ -32,8 +32,6 @@ export function useRecommendations(
   const [rawData, setRawData] = useState<any>(null);
   const hasLoadedFromServerRef = useRef(false);
 
-  const STORAGE_KEY = `recommendations_${userId}`;
-
   // Load saved recommendations from server on mount
   useEffect(() => {
     const loadSavedRecommendations = async () => {
@@ -48,36 +46,15 @@ export function useRecommendations(
           setRawData(response);
           const transformed = pipeline.process(response.recommendations);
           setRecommendations(transformed);
-          // Update localStorage with loaded recommendations
-          try {
-            if (typeof window !== "undefined") {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(transformed));
-            }
-          } catch {
-            // ignore storage errors
-          }
         }
       } catch (err) {
         // Silently fail - server might not have saved recommendations yet
         console.debug("No saved recommendations found on server");
-        
-        // Fallback to localStorage if available
-        try {
-          if (typeof window === "undefined") return;
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
-          const parsed = JSON.parse(raw) as Recommendation[];
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setRecommendations(parsed);
-          }
-        } catch {
-          // ignore parse errors
-        }
       }
     };
 
     loadSavedRecommendations();
-  }, [STORAGE_KEY]);
+  }, []);
 
   const pipeline = useMemo(() => {
     return new RecommendationPipeline(
@@ -102,14 +79,6 @@ export function useRecommendations(
 
       const transformed = pipeline.process(response.recommendations);
       setRecommendations(transformed);
-      // persist recommendations to localStorage
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(transformed));
-        }
-      } catch {
-        // ignore storage errors
-      }
     } catch (err) {
       let errorMessage = "Error fetching recommendations";
 
@@ -130,13 +99,6 @@ export function useRecommendations(
     setRecommendations([]);
     setError(null);
     setRawData(null);
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    } catch {
-      // ignore
-    }
   }, []);
 
   return {

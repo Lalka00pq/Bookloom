@@ -49,6 +49,7 @@ export default function Page() {
           : 0,
         tags: (node.properties?.subjects as string[]) || [],
         progress: 0,
+        cover: (node.properties?.cover as string) || undefined,
       }));
 
     const existingBookIds = new Set(books.map((b) => b.id));
@@ -57,7 +58,6 @@ export default function Page() {
         addBook(book);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graphData.nodes.length, graphData.nodes.map((n) => n.id).join(",")]);
 
   const handleSearch = () => {
@@ -84,6 +84,7 @@ export default function Page() {
         year: book.published ? parseInt(book.published.split("-")[0]) || 0 : 0,
         tags: book.subjects || [],
         progress: 0,
+        cover: book.cover,
       };
       addBook(bookForState);
       
@@ -108,7 +109,6 @@ export default function Page() {
   return (
     <main className="relative z-10 min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-[1920px]">
-        {/* Message about the backend being unavailable */}
         {!isChecking && isHealthy === false && (
           <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
             <p className="text-sm text-red-300 font-mono">
@@ -126,7 +126,6 @@ export default function Page() {
           isGraphEmpty={graphData.nodes.length === 0}
         />
 
-        {/* Main layout*/}
         <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(200px,280px)_1fr_minmax(200px,280px)] xl:grid-cols-[minmax(250px,320px)_1fr_minmax(250px,320px)]">
           <LibraryPanel
             books={filteredBooks}
@@ -185,7 +184,6 @@ export default function Page() {
         </section>
       </div>
 
-      {/* Search Modal */}
       <SearchModal
         isOpen={isSearchModalOpen}
         onClose={() => {

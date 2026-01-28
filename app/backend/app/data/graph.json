@@ -2,90 +2,20 @@
   "nodes": [
     {
       "id": "1",
-      "label": "Neuromancer",
+      "label": "Horus Rising",
       "properties": {
-        "code": "Bd_UZAdvUDIC",
-        "title": "Neuromancer",
-        "author": "William Gibson",
-        "published": "2000-07-01",
-        "isbn": "9781101146460",
+        "code": "2R_3oAEACAAJ",
+        "title": "Horus Rising",
+        "author": "Dan Abnett",
+        "published": "2018-08-28",
+        "isbn": "9781849707435",
         "subjects": [
           "Fiction"
         ],
-        "description": "Winner of the Hugo, Nebula, and Philip K. Dick Awards, Neuromancer is a science fiction masterpiece—a classic that ranks as one of the twentieth century’s most potent visions of the future. Case was the sharpest data-thief in the matrix—until he crossed the wrong people and they crippled his nervous system, banishing him from cyberspace. Now a mysterious new employer has recruited him for a last-chance run at an unthinkably powerful artificial intelligence. With a dead man riding shotgun and Molly, a mirror-eyed street-samurai, to watch his back, Case is ready for the adventure that upped the ante on an entire genre of fiction. Neuromancer was the first fully-realized glimpse of humankind’s digital future—a shocking vision that has challenged our assumptions about technology and ourselves, reinvented the way we speak and think, and forever altered the landscape of our imaginations.",
-        "cover": "http://books.google.com/books/content?id=Bd_UZAdvUDIC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-      }
-    },
-    {
-      "id": "2",
-      "label": "Count Zero",
-      "properties": {
-        "code": "7RpZX8mYKVMC",
-        "title": "Count Zero",
-        "author": "William Gibson",
-        "published": "1987-04-01",
-        "isbn": "9781101146477",
-        "subjects": [
-          "Fiction"
-        ],
-        "description": "William Gibson continues the visionary Sprawl Trilogy that began with Neuromancer in this frighteningly probable parable of the future. A corporate mercenary wakes in a reconstructed body, a beautiful woman by his side. Then Hosaka Corporation reactivates him, for a mission more dangerous than the one he’s recovering from: to get a defecting chief of R&D—and the biochip he’s perfected—out intact. But this proves to be of supreme interest to certain other parties—some of whom aren’t remotely human....",
-        "cover": "http://books.google.com/books/content?id=7RpZX8mYKVMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-      }
-    },
-    {
-      "id": "3",
-      "label": "Solaris",
-      "properties": {
-        "code": "E5khWQMmrTUC",
-        "title": "Solaris",
-        "author": "Stanisław Lem",
-        "published": "1987",
-        "isbn": "9780156837507",
-        "subjects": [
-          "Fiction"
-        ],
-        "description": "When psychologist Kris Kelvin arrives at the planet Solaris to study the ocean that covers its surface, he finds himself confronting a painful memory embodied in the physical likeness of a past lover. Kelvin learns that he is not alone in this and that other crews examining the planet are plagued with their own repressed and newly real memories. Could it be, as Solaris scientists speculate, that the ocean may be a massive neural center creating these memories, for a reason no one can identify?",
-        "cover": "http://books.google.com/books/content?id=E5khWQMmrTUC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
-      }
-    },
-    {
-      "id": "4",
-      "label": "Пикник на обочине",
-      "properties": {
-        "code": "IUA_DwAAQBAJ",
-        "title": "Пикник на обочине",
-        "author": "Аркадий и Борис Стругацкие",
-        "published": "2007-12-21",
-        "isbn": "9785425040206",
-        "subjects": [
-          "Fiction"
-        ],
-        "description": "«Счастье для всех, и пусть никто не уйдёт обиженным!» Знаковые слова...Шедевр братьев Стругацких. Жёсткая, бесконечно увлекательная и в то же время бесконечно философская книга.Время идёт... Но история загадочной Зоны и лучшего из её сталкеров – Рэда Шухарта – по-прежнему тревожит и будоражит читателя.",
-        "cover": "http://books.google.com/books/content?id=IUA_DwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-      }
-    },
-    {
-      "id": "5",
-      "label": "Дети капитана Гранта",
-      "properties": {
-        "code": "Mn5IEQAAQBAJ",
-        "title": "Дети капитана Гранта",
-        "author": "Жюль Верн",
-        "published": "2025-02-19",
-        "isbn": "9785047242323",
-        "subjects": [
-          "Travel"
-        ],
-        "description": "На поиски пропавшего капитана Гранта отправляется яхта «Дункан». Но не все ясно с маршрутом. В каком океане искать капитана? Великая классика Жюля Верна, неоднократно экранизированная.",
-        "cover": "http://books.google.com/books/content?id=Mn5IEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        "description": "Re-release of the mass market edition of the first novel in the best selling Horus Heresy series Under the benevolent leadership of the Immortal Emperor the Imperium of Man has stretched out across the galaxy. On the eve of victory, the Emperor leaves the front lines, entrusting the great crusade to his favorite son, Horus. Promoted to Warmaster, the idealistic Horus tries to carry out the Emperor'sgrand design, all the while the seeds of heresy and rebellion have been sowed amongst his brothers.",
+        "cover": "http://books.google.com/books/content?id=2R_3oAEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
       }
     }
   ],
-  "edges": [
-    {
-      "source": "1",
-      "target": "2",
-      "weight": 4.0
-    }
-  ]
+  "edges": []
 }

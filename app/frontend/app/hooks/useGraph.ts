@@ -4,26 +4,9 @@ import type { Graph, Node } from "../schemas/graph";
 import { graphApi } from "../utils/api";
 
 export function useGraph() {
-  const STORAGE_KEY = "graph_data";
-  const hasLoadedFromStorageRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
-  const getInitialGraph = (): GraphData => {
-    try {
-      if (typeof window === "undefined") return { nodes: [], links: [] };
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { nodes: [], links: [] };
-      const parsed = JSON.parse(raw) as GraphData;
-      // Улучшенная проверка: граф должен быть не пуст
-      if (parsed.nodes && Array.isArray(parsed.nodes) && parsed.nodes.length > 0) {
-        return parsed;
-      }
-      return { nodes: [], links: [] };
-    } catch {
-      return { nodes: [], links: [] };
-    }
-  };
-
-  const [graphData, setGraphData] = useState<GraphData>(getInitialGraph);
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,31 +31,17 @@ export function useGraph() {
 
       const newGraphData = { nodes, links };
       setGraphData(newGraphData);
-      // Сохранить граф в localStorage
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newGraphData));
-        }
-      } catch {
-        
-      }
     } catch (err) {
-      
-      const fallbackData = getInitialGraph();
-      if (fallbackData.nodes.length > 0) {
-        setGraphData(fallbackData);
-      } else {
-        setError(err instanceof Error ? err.message : "Error loading graph");
-        setGraphData({ nodes: [], links: [] });
-      }
+      setError(err instanceof Error ? err.message : "Error loading graph");
+      setGraphData({ nodes: [], links: [] });
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedFromStorageRef.current) {
-      hasLoadedFromStorageRef.current = true;
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
       loadGraph();
     }
   }, [loadGraph]);

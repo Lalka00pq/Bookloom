@@ -5,6 +5,7 @@ export type Book = {
   year: number;
   tags: string[];
   progress: number; // 0–100
+  cover?: string;
 };
 
 export type Recommendation = {
@@ -15,6 +16,7 @@ export type Recommendation = {
   matchScore: number; // 0–1
   genre?: string;
   tags?: string[];
+  cover?: string;
 };
 
 export type GraphNode = {
