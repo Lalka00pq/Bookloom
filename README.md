@@ -38,7 +38,7 @@ API documentation (when the backend is running): http://localhost:8000/docs
 
 ## Screenshots
 
-![Screenshot 1](images/image1.png)
+![Screenshot 1](images/image_1.png)
 
 © Bookloom Project
 
