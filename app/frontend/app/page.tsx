@@ -7,6 +7,7 @@ import { GraphField } from "./components/GraphField";
 import { RecommendationsPanel } from "./components/RecommendationsPanel";
 import { SearchModal } from "./components/SearchModal";
 import { EditBookModal } from "./components/EditBookModal";
+import { RecommendationModal } from "./components/RecommendationModal";
 import { useBooks } from "./hooks/useBooks";
 import { useGraph } from "./hooks/useGraph";
 import { useHealthCheck } from "./hooks/useHealthCheck";
@@ -21,6 +22,7 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<Recommendation | null>(null);
 
   const { isHealthy, isChecking } = useHealthCheck();
 
@@ -203,6 +205,7 @@ export default function Page() {
             isLoading={isLoadingRecs}
             error={recsError}
             isEmpty={graphData.nodes.length === 0}
+            onRecommendationClick={(rec) => setSelectedRecommendation(rec)}
           />
         </section>
       </div>
@@ -245,6 +248,14 @@ export default function Page() {
               throw error;
             }
           }}
+        />
+      )}
+
+      {selectedRecommendation && (
+        <RecommendationModal
+          isOpen={selectedRecommendation !== null}
+          onClose={() => setSelectedRecommendation(null)}
+          recommendation={selectedRecommendation}
         />
       )}
     </main>

@@ -9,6 +9,7 @@ interface RecommendationsPanelProps {
   isLoading?: boolean;
   error?: string | null;
   isEmpty?: boolean;
+  onRecommendationClick?: (recommendation: Recommendation) => void;
 }
 
 export function RecommendationsPanel({
@@ -16,6 +17,7 @@ export function RecommendationsPanel({
   isLoading = false,
   error = null,
   isEmpty = false,
+  onRecommendationClick,
 }: RecommendationsPanelProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -72,7 +74,8 @@ export function RecommendationsPanel({
           recommendations.map((rec) => (
             <article
               key={rec.id}
-              className="bg-black/40 border-l-2 border-[#ff00ff]/50 p-3 rounded hover:bg-black/60 hover:border-[#ff00ff] hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] transition-all duration-200 scanline group"
+              onClick={() => onRecommendationClick?.(rec)}
+              className="bg-black/40 border-l-2 border-[#ff00ff]/50 p-3 rounded hover:bg-black/60 hover:border-[#ff00ff] hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] transition-all duration-200 scanline group cursor-pointer"
             >
               <div className="flex gap-3 items-start mb-2">
                 {rec.cover && (

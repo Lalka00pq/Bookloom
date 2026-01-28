@@ -3,52 +3,51 @@
   "recommendations": [
     {
       "book_id": null,
-      "title": "Mona Lisa Overdrive",
-      "author": "William Gibson",
-      "reason": "You have read 'Neuromancer' and 'Count Zero,' which are the first two books in William Gibson's seminal Sprawl Trilogy. 'Mona Lisa Overdrive' is the third and final novel in this series, making it a natural and highly recommended next read to complete the story and further explore the universe you've already enjoyed.",
-      "score": 0.98,
+      "title": "False Gods",
+      "author": "Graham McNeill",
+      "reason": "As the direct sequel to 'Horus Rising' and the second book in the pivotal Horus Heresy series, this novel continues the epic saga of betrayal and galaxy-spanning war, deepening the narrative and character arcs established in the first installment.",
+      "score": 0.95,
       "metadata": {
         "genre": "Science Fiction",
         "tags": [
-          "Cyberpunk",
-          "Sprawl Trilogy",
-          "Artificial Intelligence",
-          "Virtual Reality",
-          "Dystopian"
+          "Warhammer 40,000",
+          "Horus Heresy",
+          "Military Science Fiction",
+          "Space Opera",
+          "Epic Fantasy"
         ]
       }
     },
     {
       "book_id": null,
-      "title": "Snow Crash",
-      "author": "Neal Stephenson",
-      "reason": "As a fan of 'Neuromancer,' you'll appreciate 'Snow Crash' as another landmark work in the cyberpunk genre. It's known for its groundbreaking depiction of the metaverse, its unique blend of action and satire, and its complex world-building, offering a different but equally influential take on the cyberpunk aesthetic.",
-      "score": 0.92,
+      "title": "Eisenhorn: Xenos",
+      "author": "Dan Abnett",
+      "reason": "Written by the same author as 'Horus Rising', this novel introduces the user to the acclaimed Eisenhorn series, focusing on an Inquisitor within the Warhammer 40,000 universe. It offers a thrilling blend of detective mystery, action, and deep lore, showcasing another compelling facet of the same rich setting.",
+      "score": 0.88,
       "metadata": {
         "genre": "Science Fiction",
         "tags": [
-          "Cyberpunk",
-          "Dystopian",
-          "Virtual Reality",
-          "Metaverse",
+          "Warhammer 40,000",
+          "Military Science Fiction",
+          "Detective Fiction",
+          "Space Opera",
+          "Mystery"
+        ]
+      }
+    },
+    {
+      "book_id": null,
+      "title": "Brothers of the Snake",
+      "author": "Dan Abnett",
+      "reason": "Another excellent standalone novel by Dan Abnett set in the Warhammer 40,000 universe. It provides a different perspective on the Space Marines and their epic battles, offering a similar blend of grim-dark action and compelling character focus as 'Horus Rising', but without requiring knowledge of a long series.",
+      "score": 0.82,
+      "metadata": {
+        "genre": "Science Fiction",
+        "tags": [
+          "Warhammer 40,000",
+          "Military Science Fiction",
+          "Space Opera",
           "Action"
-        ]
-      }
-    },
-    {
-      "book_id": null,
-      "title": "Do Androids Dream of Electric Sheep?",
-      "author": "Philip K. Dick",
-      "reason": "Given your interest in 'Neuromancer' (a cornerstone of cyberpunk) and 'Solaris' (philosophical science fiction), this classic by Philip K. Dick offers a compelling blend of these elements. It explores profound themes of humanity, artificial intelligence, and the nature of reality, which are central to both the cyberpunk genre and the introspective feel of 'Solaris'.",
-      "score": 0.9,
-      "metadata": {
-        "genre": "Science Fiction",
-        "tags": [
-          "Dystopian",
-          "Post-Apocalyptic",
-          "Artificial Intelligence",
-          "Philosophical",
-          "Proto-Cyberpunk"
         ]
       }
     }
