@@ -10,4 +10,5 @@ dist/
 wheels/
 *.egg-info
 tech.md
+*.logs
 code_analysis_report.md
