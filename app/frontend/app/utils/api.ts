@@ -134,6 +134,14 @@ export const recommendationsApi = {
       },
     );
   },
+  getSavedRecommendations: async (): Promise<import("../schemas/recommendations").RecommendationsResponse> => {
+    return fetchApi<import("../schemas/recommendations").RecommendationsResponse>(
+      "/analytics/recommendations",
+      {
+        method: "GET",
+      },
+    );
+  },
 };
 
 export { ApiError };

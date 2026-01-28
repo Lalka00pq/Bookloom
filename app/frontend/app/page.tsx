@@ -6,6 +6,8 @@ import { LibraryPanel } from "./components/LibraryPanel";
 import { GraphField } from "./components/GraphField";
 import { RecommendationsPanel } from "./components/RecommendationsPanel";
 import { SearchModal } from "./components/SearchModal";
+import { EditBookModal } from "./components/EditBookModal";
+import { RecommendationModal } from "./components/RecommendationModal";
 import { useBooks } from "./hooks/useBooks";
 import { useGraph } from "./hooks/useGraph";
 import { useHealthCheck } from "./hooks/useHealthCheck";
@@ -13,11 +15,14 @@ import { useRecommendations } from "./hooks/useRecommendations";
 import { booksGraphApi, graphApi, ApiError } from "./utils/api";
 import type { Book, Recommendation } from "./types";
 import type { BookSearchItem } from "./schemas/books_search";
+import type { Node } from "./schemas/graph";
 
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<Recommendation | null>(null);
 
   const { isHealthy, isChecking } = useHealthCheck();
 
@@ -49,6 +54,7 @@ export default function Page() {
           : 0,
         tags: (node.properties?.subjects as string[]) || [],
         progress: 0,
+        cover: (node.properties?.cover as string) || undefined,
       }));
 
     const existingBookIds = new Set(books.map((b) => b.id));
@@ -57,12 +63,22 @@ export default function Page() {
         addBook(book);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graphData.nodes.length, graphData.nodes.map((n) => n.id).join(",")]);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
       setIsSearchModalOpen(true);
+    }
+  };
+  
+  const handleRequestEdit = (nodeId: string) => {
+    const node = graphData.nodes.find((n) => n.id === nodeId);
+    if (node) {
+      setEditingNode({
+        id: node.id,
+        label: node.label,
+        properties: node.properties || {},
+      });
     }
   };
 
@@ -84,6 +100,7 @@ export default function Page() {
         year: book.published ? parseInt(book.published.split("-")[0]) || 0 : 0,
         tags: book.subjects || [],
         progress: 0,
+        cover: book.cover,
       };
       addBook(bookForState);
       
@@ -95,7 +112,7 @@ export default function Page() {
     } catch (error) {
       if (error instanceof ApiError) {
         console.error("Error adding book:", error.message);
-        alert(`Ошибка: ${error.message}`);
+        alert(`Error: ${error.message}`);
       } else {
         console.error("Unexpected error:", error);
         alert("Error adding book. Please try again.");
@@ -108,7 +125,6 @@ export default function Page() {
   return (
     <main className="relative z-10 min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-[1920px]">
-        {/* Сообщение о недоступности backend */}
         {!isChecking && isHealthy === false && (
           <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
             <p className="text-sm text-red-300 font-mono">
@@ -126,17 +142,25 @@ export default function Page() {
           isGraphEmpty={graphData.nodes.length === 0}
         />
 
-        {/* Main layout*/}
         <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(200px,280px)_1fr_minmax(200px,280px)] xl:grid-cols-[minmax(250px,320px)_1fr_minmax(250px,320px)]">
           <LibraryPanel
             books={filteredBooks}
             activeBookId={activeBookId}
-            onBookSelect={setActiveBookId}
+            onBookSelect={(bookId) => {
+              setActiveBookId(bookId);
+              const node = graphData.nodes.find(
+                (n) => n.properties?.code === bookId,
+              );
+              if (node) {
+                handleRequestEdit(node.id);
+              }
+            }}
           />
 
           <GraphField
             graphData={graphData}
             activeBook={activeBook}
+            onRequestEdit={handleRequestEdit}
             onNodeClick={(nodeId) => {
 
               const node = graphData.nodes.find((n) => n.id === nodeId);
@@ -153,7 +177,7 @@ export default function Page() {
                 
                 const node = graphData.nodes.find((n) => n.id === nodeId);
                 if (!node) {
-                  throw new Error("Узел не найден");
+                  throw new Error("Node not found");
                 }
 
 
@@ -181,11 +205,11 @@ export default function Page() {
             isLoading={isLoadingRecs}
             error={recsError}
             isEmpty={graphData.nodes.length === 0}
+            onRecommendationClick={(rec) => setSelectedRecommendation(rec)}
           />
         </section>
       </div>
 
-      {/* Search Modal */}
       <SearchModal
         isOpen={isSearchModalOpen}
         onClose={() => {
@@ -196,6 +220,44 @@ export default function Page() {
         existingBookCodes={new Set(books.map((b) => b.id))}
         onAddBook={handleAddBook}
       />
+
+      {editingNode && (
+        <EditBookModal
+          isOpen={editingNode !== null}
+          onClose={() => setEditingNode(null)}
+          node={editingNode}
+          onSave={async (nodeId, newDescription) => {
+            try {
+              const node = graphData.nodes.find((n) => n.id === nodeId);
+              if (!node) throw new Error("Node not found");
+
+              await graphApi.changeNode(nodeId, {
+                label: node.label,
+                properties: {
+                  ...node.properties,
+                  description: newDescription,
+                },
+              });
+
+              await refreshGraph();
+              setEditingNode(null);
+            } catch (error) {
+              if (error instanceof ApiError) {
+                throw new Error(error.message);
+              }
+              throw error;
+            }
+          }}
+        />
+      )}
+
+      {selectedRecommendation && (
+        <RecommendationModal
+          isOpen={selectedRecommendation !== null}
+          onClose={() => setSelectedRecommendation(null)}
+          recommendation={selectedRecommendation}
+        />
+      )}
     </main>
   );
 }

@@ -1,7 +1,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h3 align="center">BookGraph Backend</h3>
+  <h3 align="center">BookLoom Backend</h3>
 
   <p align="center">
     Powerful API server for book graph visualization and AI-powered recommendations
@@ -9,10 +9,6 @@
     <a href="http://localhost:8000"><strong>View API Docs »</strong></a>
   </p>
 </div>
-
-
->[!warning] 
->**Project isn't ready yet**
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -113,9 +109,7 @@ Before you begin, ensure you have the following installed:
 
 6. Start the server
    ```sh
-   python -m uvicorn app.main:app --reload
-   or 
-   fastapi run main.py --reload
+   fastapi run app/main.py --reload
    ```
 
 The API will be available at `http://localhost:8000`

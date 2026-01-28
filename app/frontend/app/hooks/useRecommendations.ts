@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Recommendation } from "../types";
 import { recommendationsApi, ApiError } from "../utils/api";
 import type { RecommendationsResponse } from "../schemas/recommendations";
@@ -30,23 +30,31 @@ export function useRecommendations(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rawData, setRawData] = useState<any>(null);
+  const hasLoadedFromServerRef = useRef(false);
 
-  const STORAGE_KEY = `recommendations_${userId}`;
-
-  // Load cached recommendations from localStorage on mount
+  // Load saved recommendations from server on mount
   useEffect(() => {
-    try {
-      if (typeof window === "undefined") return;
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Recommendation[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setRecommendations(parsed);
+    const loadSavedRecommendations = async () => {
+      try {
+        if (hasLoadedFromServerRef.current) return;
+        hasLoadedFromServerRef.current = true;
+
+        const response: RecommendationsResponse =
+          await recommendationsApi.getSavedRecommendations();
+
+        if (response.recommendations && response.recommendations.length > 0) {
+          setRawData(response);
+          const transformed = pipeline.process(response.recommendations);
+          setRecommendations(transformed);
+        }
+      } catch (err) {
+        // Silently fail - server might not have saved recommendations yet
+        console.debug("No saved recommendations found on server");
       }
-    } catch {
-      // ignore parse errors
-    }
-  }, [STORAGE_KEY]);
+    };
+
+    loadSavedRecommendations();
+  }, []);
 
   const pipeline = useMemo(() => {
     return new RecommendationPipeline(
@@ -71,14 +79,6 @@ export function useRecommendations(
 
       const transformed = pipeline.process(response.recommendations);
       setRecommendations(transformed);
-      // persist recommendations to localStorage
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(transformed));
-        }
-      } catch {
-        // ignore storage errors
-      }
     } catch (err) {
       let errorMessage = "Error fetching recommendations";
 
@@ -99,13 +99,6 @@ export function useRecommendations(
     setRecommendations([]);
     setError(null);
     setRawData(null);
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    } catch {
-      // ignore
-    }
   }, []);
 
   return {

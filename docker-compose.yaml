@@ -9,6 +9,7 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    container_name: backend-bookloom
 
   frontend:
     build:
@@ -21,8 +22,7 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-# Optional: add a network if you need custom settings
+    container_name: frontend-bookloom
 networks:
   default:
     driver: bridge

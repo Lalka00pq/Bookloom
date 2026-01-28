@@ -3,79 +3,29 @@ from typing import Dict, Any, Optional
 
 # project
 from app.schemas.graph import Node, Edge, Graph
+from app.core.graph_persistence import GraphPersistenceService
 
 # 3rd party
 import networkx as nx
 
 
 class NetworkXGraph:
-    """Graph implementation using NetworkX library."""
+    """Wrapper for NetworkX library operations"""
 
     def __init__(self):
-        """Initialize an empty graph."""
         self.graph = nx.DiGraph()
-        self._node_counter = 0
 
-    def _generate_node_id(self) -> str:
-        """Generate a unique node ID.
-
-        Returns:
-            str: A unique node ID
-        """
-        self._node_counter += 1
-        return str(self._node_counter)
-
-    def show_graph(self) -> Graph:
-        """Show the graph structure.
-
-        Returns:
-            Graph: graph structure
-        """
-        nodes = [Node(id=str(n), label=self.graph.nodes[n]['label'],
-                      properties=self.graph.nodes[n]['properties']) for n in self.graph.nodes]
-        edges = [Edge(source=str(u), target=str(
-            v), weight=self.graph.edges[u, v]['weight']) for u, v in self.graph.edges]
-        return Graph(nodes=nodes, edges=edges)
-
-    def add_node(self, label: str, properties: Dict[str, Any]) -> Node:
-        """Add a node to the graph.
-
-        Args:
-            label (str): Node label
-            properties (Dict[str, Any]): Node properties
-
-        Returns:
-            Node: Added node
-        """
-        node_id = self._generate_node_id()
+    def add_node(self, node_id: str, label: str, properties: Dict[str, Any]) -> Node:
         self.graph.add_node(node_id, label=label, properties=properties)
         return Node(id=node_id, label=label, properties=properties)
 
     def remove_node(self, node_id: str) -> bool:
-        """Remove a node from the graph.
-
-        Args:
-            node_id (str): Node ID
-
-        Returns:
-            bool: True if the node was removed, False otherwise
-        """
         if self.graph.has_node(node_id):
             self.graph.remove_node(node_id)
             return True
         return False
 
     def change_node(self, node_id: str, label: str, properties: Dict[str, Any]) -> bool:
-        """Change a node in the graph.
-
-        Args:
-            node_id (str): Node id
-            label (str): Node label
-            properties (Dict[str, Any]): Node properties
-
-        Returns:
-            bool: True if the node was changed, False otherwise
-        """
         if self.graph.has_node(node_id):
             self.graph.nodes[node_id]['label'] = label
             self.graph.nodes[node_id]['properties'] = properties
@@ -83,50 +33,25 @@ class NetworkXGraph:
         return False
 
     def add_edge(self, source: str, target: str, weight: float) -> Edge:
-        """Add an edge to the graph.
-
-        Args:
-            source (str): Source node ID
-            target (str): Target node ID
-            weight (float): Edge weight
-
-        Raises:
-            ValueError: If both source and target nodes do not exist
-
-        Returns:
-            Edge: Added edge
-        """
         if not self.graph.has_node(source) or not self.graph.has_node(target):
             raise ValueError("Both source and target nodes must exist.")
-
         self.graph.add_edge(source, target, weight=weight)
         return Edge(source=source, target=target, weight=weight)
 
     def remove_edge(self, source: str, target: str) -> bool:
-        """Remove an edge from the graph.
-
-        Args:
-            source (str): Source node ID
-            target (str): Target node ID
-
-        Returns:
-            bool: True if the edge was removed, False otherwise
-        """
         if self.graph.has_edge(source, target):
             self.graph.remove_edge(source, target)
             return True
         return False
 
+    def get_structure(self) -> Graph:
+        nodes = [Node(id=str(n), label=self.graph.nodes[n]['label'],
+                      properties=self.graph.nodes[n]['properties']) for n in self.graph.nodes]
+        edges = [Edge(source=str(u), target=str(
+            v), weight=self.graph.edges[u, v]['weight']) for u, v in self.graph.edges]
+        return Graph(nodes=nodes, edges=edges)
+
     def find_node_by_property(self, property_key: str, property_value: Any) -> Optional[Node]:
-        """Find a node by a specific property value.
-
-        Args:
-            property_key: The key of the property to search for
-            property_value: The value of the property to match
-
-        Returns:
-            Node if found, None otherwise
-        """
         for node_id in self.graph.nodes:
             node_properties = self.graph.nodes[node_id].get('properties', {})
             if node_properties.get(property_key) == property_value:
@@ -137,6 +62,125 @@ class NetworkXGraph:
                 )
         return None
 
+    def has_node(self, node_id: str) -> bool:
+        return self.graph.has_node(node_id)
 
-# Initialize the graph
-graph_instance = NetworkXGraph()
+
+class IdGenerator:
+    """Manages unique ID generation"""
+
+    def __init__(self, start_id: int = 0):
+        self._counter = start_id
+
+    def next_id(self) -> str:
+        self._counter += 1
+        return str(self._counter)
+
+    def sync_with_existing_ids(self, nodes: list[Dict[str, Any]]) -> None:
+        for node in nodes:
+            node_id = node.get("id")
+            if node_id:
+                try:
+                    self._counter = max(self._counter, int(node_id))
+                except (ValueError, TypeError):
+                    pass
+
+
+class GraphManager:
+    """Orchestrates graph operations, persistence and ID generation"""
+
+    def __init__(
+        self,
+        graph: Optional[NetworkXGraph] = None,
+        persistence_service: Optional[GraphPersistenceService] = None,
+        id_generator: Optional[IdGenerator] = None
+    ):
+        self._graph = graph or NetworkXGraph()
+        self._persistence_service = persistence_service or GraphPersistenceService()
+        self._id_generator = id_generator or IdGenerator()
+        self.load_from_storage()
+
+    def load_from_storage(self) -> None:
+        """Load graph data from storage and populate the in-memory graph."""
+        try:
+            graph_data = self._persistence_service.load_graph()
+            nodes = graph_data.get("nodes", [])
+            edges = graph_data.get("edges", [])
+
+            if not nodes:
+                return
+
+            self._id_generator.sync_with_existing_ids(nodes)
+
+            for node_data in nodes:
+                self._graph.add_node(
+                    node_id=node_data.get("id"),
+                    label=node_data.get("label", ""),
+                    properties=node_data.get("properties", {}),
+                )
+
+            for edge_data in edges:
+                source = edge_data.get("source")
+                target = edge_data.get("target")
+                if source and target and self._graph.has_node(source) and self._graph.has_node(target):
+                    self._graph.add_edge(
+                        source,
+                        target,
+                        weight=edge_data.get("weight", 1.0),
+                    )
+        except Exception as e:
+            from app.core.logging import get_logger
+            logger = get_logger(__name__)
+            logger.error("Failed to load graph from storage", error=str(e))
+
+    def _save_to_storage(self) -> None:
+        """Save current graph state to storage."""
+        try:
+            graph_struct = self._graph.get_structure()
+            # Convert to dict for persistence layer
+            graph_data = graph_struct.model_dump()
+            self._persistence_service.save_graph(graph_data)
+        except Exception as e:
+            from app.core.logging import get_logger
+            logger = get_logger(__name__)
+            logger.error("Failed to save graph to storage", error=str(e))
+
+    def show_graph(self) -> Graph:
+        return self._graph.get_structure()
+
+    def add_node(self, label: str, properties: Dict[str, Any]) -> Node:
+        node_id = self._id_generator.next_id()
+        new_node = self._graph.add_node(node_id, label, properties)
+        self._save_to_storage()
+        return new_node
+
+    def remove_node(self, node_id: str) -> bool:
+        success = self._graph.remove_node(node_id)
+        if success:
+            self._save_to_storage()
+        return success
+
+    def change_node(self, node_id: str, label: str, properties: Dict[str, Any]) -> bool:
+        success = self._graph.change_node(node_id, label, properties)
+        if success:
+            self._save_to_storage()
+        return success
+
+    def add_edge(self, source: str, target: str, weight: float) -> Edge:
+        new_edge = self._graph.add_edge(source, target, weight)
+        self._save_to_storage()
+        return new_edge
+
+    def remove_edge(self, source: str, target: str) -> bool:
+        success = self._graph.remove_edge(source, target)
+        if success:
+            self._save_to_storage()
+        return success
+
+    def find_node_by_property(self, property_key: str, property_value: Any) -> Optional[Node]:
+        return self._graph.find_node_by_property(property_key, property_value)
+
+
+# Initialize the graph orchestrator
+graph_instance = GraphManager()
+

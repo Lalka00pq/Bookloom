@@ -19,6 +19,7 @@ export class DefaultRecommendationTransformer
       matchScore: rec.score,
       genre: rec.metadata?.genre,
       tags: rec.metadata?.tags,
+      cover: rec.metadata?.cover,
     }));
   }
 }

@@ -49,13 +49,6 @@ class GeminiSettings(BaseModel):
     api_url: str = GEMINI_API_URL
     timeout: float = 30.0
 
-
-class ApiModelSettings(BaseModel):
-    """API model settings."""
-    API_MODEL_URL: str = "https://api.example.com/model"
-    API_MODEL_KEY: str = "your_api"
-
-
 class HealthMonitorSettings(BaseModel):
     """Settings for health monitoring service."""
     enabled: bool = True
@@ -63,9 +56,3 @@ class HealthMonitorSettings(BaseModel):
     base_url: str = "http://localhost:8000"
     health_endpoint: str = "/health/check"
     timeout: float = 5.0
-
-
-class API_Settings(BaseModel):
-    """API settings."""
-    api_books: "ApiBooksSettings" = ApiBooksSettings()
-    api_model: "ApiModelSettings" = ApiModelSettings()

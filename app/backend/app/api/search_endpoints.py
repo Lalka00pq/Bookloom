@@ -95,9 +95,9 @@ async def search_books(request: BookSearchRequest) -> BookSearchResponse:
         published = volume_info.get("publishedDate")
 
         isbn = None
-        for ident in volume_info.get("industryIdentifiers", []) or []:
-            id_type = ident.get("type")
-            id_val = ident.get("identifier")
+        for identifier in volume_info.get("industryIdentifiers", []) or []:
+            id_type = identifier.get("type")
+            id_val = identifier.get("identifier")
             if id_type == "ISBN_13" and id_val:
                 isbn = id_val
                 break

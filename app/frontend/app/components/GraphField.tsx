@@ -16,6 +16,7 @@ interface GraphFieldProps {
   graphData: GraphData;
   activeBook: Book | null;
   onNodeClick: (nodeId: string) => void;
+  onRequestEdit?: (nodeId: string) => void;
   onNodeEdit?: (nodeId: string, newDescription: string) => Promise<void>;
 }
 
@@ -23,36 +24,42 @@ export function GraphField({
   graphData,
   activeBook,
   onNodeClick,
+  onRequestEdit,
   onNodeEdit,
 }: GraphFieldProps) {
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
-
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(300, rect.width - 16),
-          height: Math.max(350, rect.height - 80), 
+          width: Math.floor(rect.width),
+          height: Math.floor(rect.height),
         });
       }
     };
 
-    const timeoutId = setTimeout(() => {
+    const resizeObserver = new ResizeObserver(() => {
       updateDimensions();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    updateDimensions();
+
+    const timeoutId = setTimeout(() => {
       if (graphRef.current) {
         graphRef.current.zoom(0.7);
       }
     }, 100);
 
-    window.addEventListener("resize", updateDimensions);
     return () => {
+      resizeObserver.disconnect();
       clearTimeout(timeoutId);
-      window.removeEventListener("resize", updateDimensions);
     };
   }, []);
 
@@ -65,7 +72,7 @@ export function GraphField({
             Books Graph
           </h2>
         </div>
-        {onNodeEdit && (
+        {(onNodeEdit || onRequestEdit) && (
           <p className="text-[10px] text-gray-500 font-mono hidden sm:block">
             Right-click a book node to edit its description
           </p>
@@ -102,17 +109,8 @@ export function GraphField({
             }
           }}
           onNodeRightClick={(node: any) => {
-            if (node.kind === "book" && onNodeEdit) {
-              const graphNode = graphData.nodes.find((n) => n.id === node.id);
-              if (graphNode) {
-                const nodeForEdit: Node = {
-                  id: graphNode.id,
-                  label: graphNode.label,
-                  properties: graphNode.properties || {},
-                };
-                setSelectedNode(nodeForEdit);
-                setSelectedNodeId(node.id as string);
-              }
+            if (node.kind === "book" && onRequestEdit) {
+              onRequestEdit(node.id as string);
             }
           }}
           nodeCanvasObject={(node: any, ctx, globalScale) => {
@@ -177,22 +175,6 @@ export function GraphField({
           }}
         />
       </div>
-
-      {selectedNode && onNodeEdit && (
-        <EditBookModal
-          isOpen={selectedNodeId !== null}
-          onClose={() => {
-            setSelectedNodeId(null);
-            setSelectedNode(null);
-          }}
-          node={selectedNode}
-          onSave={async (nodeId, description) => {
-            await onNodeEdit(nodeId, description);
-            setSelectedNodeId(null);
-            setSelectedNode(null);
-          }}
-        />
-      )}
     </section>
   );
 }

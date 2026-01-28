@@ -3,12 +3,13 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 import httpx
 
 from app.core.config import GeminiSettings
 from app.core.logging import get_logger
+from app.core.recommendations_persistence import RecommendationsPersistenceService
 from app.schemas.graph import Graph
 from app.schemas.recommendations import (
     BookRecommendation,
@@ -17,8 +18,6 @@ from app.schemas.recommendations import (
 
 
 class IRecommendationService(ABC):
-    """Интерфейс сервиса рекомендаций (SOLID: ISP + DIP)."""
-
     @abstractmethod
     async def get_recommendations(
         self,
@@ -27,18 +26,22 @@ class IRecommendationService(ABC):
         graph: Graph,
         limit: int,
     ) -> RecommendationsResponse:
-        """Получить рекомендации для пользователя на основе графа."""
         raise NotImplementedError
 
 
 class GeminiRecommendationService(IRecommendationService):
     """
-    Recommendation service.
+    Recommendation service with persistence
     """
 
-    def __init__(self, settings: GeminiSettings | None = None) -> None:
+    def __init__(
+        self,
+        settings: Optional[GeminiSettings] = None,
+        persistence_service: Optional[RecommendationsPersistenceService] = None,
+    ) -> None:
         self._settings = settings or GeminiSettings()
         self._logger = get_logger(self.__class__.__name__)
+        self._persistence_service = persistence_service or RecommendationsPersistenceService()
 
     async def get_recommendations(
         self,
@@ -89,6 +92,9 @@ class GeminiRecommendationService(IRecommendationService):
             recommendations_count=len(recommendations.recommendations),
         )
 
+        # Save recommendations to storage
+        self._save_recommendations(recommendations)
+
         return recommendations
 
     def _build_prompt(self, *, user_id: str, graph: Graph, limit: int) -> str:
@@ -114,7 +120,7 @@ class GeminiRecommendationService(IRecommendationService):
                 "    }\n"
                 "  ]\n"
                 "}\n\n"
-                "YOU MUST RETURN ONLY 3 (not less and not more) RECOMMENDATIONS IN JSON."
+                "YOU MUST RETURN ONLY 3 (not less and not more) RECOMMENDATIONS IN JSON. Don't recommend books already read by user. "
             ),  # TODO Проблема в лимите рекомендаций
             "user_id": user_id,
             "graph": graph_payload,
@@ -231,11 +237,9 @@ class GeminiRecommendationService(IRecommendationService):
         """
         Parser Gemini response.
 
-.
-
         Args:
-            raw_text: Сырой текст ответа от Gemini
-            user_id: Идентификатор пользователя
+            raw_text: Gemini response text
+            user_id: User ID
 
         Returns:
             RecommendationsResponse
@@ -254,3 +258,39 @@ class GeminiRecommendationService(IRecommendationService):
             ]
         }
         return self._parse_response(data=mock_data, user_id=user_id)
+
+    def _save_recommendations(self, recommendations: RecommendationsResponse) -> None:
+        """Save recommendations to storage
+
+        Args:
+            recommendations (RecommendationsResponse): Recommendations to save
+        """
+        try:
+            recommendations_data = recommendations.model_dump()
+            self._persistence_service.save_recommendations(
+                recommendations_data)
+        except Exception as e:
+            # Log error but don't fail - recommendations are still in memory
+            self._logger.error(
+                "Failed to save recommendations to storage",
+                error=str(e),
+            )
+
+    def load_saved_recommendations(self) -> RecommendationsResponse:
+        """Load previously saved recommendations from storage.
+
+        Returns:
+            RecommendationsResponse: Loaded recommendations or empty response if none exist
+        """
+        try:
+            data = self._persistence_service.load_recommendations()
+            if not data or not data.get("recommendations"):
+                return RecommendationsResponse(user_id=data.get("user_id", "") or "", recommendations=[])
+
+            return RecommendationsResponse.model_validate(data)
+        except Exception as e:
+            self._logger.error(
+                "Failed to load recommendations from storage",
+                error=str(e),
+            )
+            return RecommendationsResponse(user_id="", recommendations=[])

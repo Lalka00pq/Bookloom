@@ -10,9 +10,6 @@
   </p>
 </div>
 
->[!warning] 
->**Project isn't ready yet**
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -68,10 +65,6 @@ The frontend is built using modern web technologies:
 - 🔍 **Search Modal**: Search for books and add them to your graph
 - 💡 **Smart Recommendations**: Get personalized book recommendations
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -109,47 +102,6 @@ Before you begin, ensure you have the following installed:
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE -->
-## Usage
-
-### Development
-
-Run the development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`.
-
-### Build for Production
-
-Create an optimized production build:
-
-```bash
-npm run build
-```
-
-### Start Production Server
-
-After building, start the production server:
-
-```bash
-npm start
-```
-
-### Linting
-
-Run ESLint to check code quality:
-
-```bash
-npm run lint
-```
-
 ### Key Features Usage
 
 1. **Search Books**: Enter a search query in the header and click "Search" to open the search modal
@@ -157,8 +109,6 @@ npm run lint
 3. **View Graph**: The center panel displays an interactive graph of your books and their connections
 4. **Select Books**: Click on a book in the library panel or on a node in the graph to highlight it
 5. **Analyze**: Click "Analies" button to analyze connections and generate recommendations
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -190,8 +140,6 @@ app/frontend/
 ├── next.config.ts          # Next.js configuration
 └── README.md               # This file
 ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 

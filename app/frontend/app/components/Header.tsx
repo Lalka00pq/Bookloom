@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react"; // 1. Добавляем хуки
-import { Search, Cpu, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, Cpu } from "lucide-react";
 
 interface HeaderProps {
   query: string;
@@ -20,7 +20,7 @@ export function Header({
   isAnalyzing,
   isGraphEmpty = true,
 }: HeaderProps) {
-  // 2. Флаг монтирования
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function Header({
       {/* Logo */}
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center">
-          <BookOpen className="h-6 w-6 text-[#00fff7] glow-cyan-text" />
+          <img src="/logo_.svg" alt="BookLoom Logo" className="h-10 w-10 object-contain" />
         </div>
         <div>
           <h1 className="text-lg font-bold text-white font-mono tracking-wider sm:text-xl">
@@ -58,7 +58,7 @@ export function Header({
             type="text"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            onKeyDown={handleKeyPress} // Исправлено: onKeyPress устарел, лучше использовать onKeyDown
+            onKeyDown={handleKeyPress}
             placeholder="Search by Title..."
             className="w-full bg-transparent text-sm text-white placeholder:text-gray-500 font-mono focus:outline-none"
           />
