@@ -6,6 +6,7 @@ import { LibraryPanel } from "./components/LibraryPanel";
 import { GraphField } from "./components/GraphField";
 import { RecommendationsPanel } from "./components/RecommendationsPanel";
 import { SearchModal } from "./components/SearchModal";
+import { EditBookModal } from "./components/EditBookModal";
 import { useBooks } from "./hooks/useBooks";
 import { useGraph } from "./hooks/useGraph";
 import { useHealthCheck } from "./hooks/useHealthCheck";
@@ -13,11 +14,13 @@ import { useRecommendations } from "./hooks/useRecommendations";
 import { booksGraphApi, graphApi, ApiError } from "./utils/api";
 import type { Book, Recommendation } from "./types";
 import type { BookSearchItem } from "./schemas/books_search";
+import type { Node } from "./schemas/graph";
 
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
 
   const { isHealthy, isChecking } = useHealthCheck();
 
@@ -63,6 +66,17 @@ export default function Page() {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       setIsSearchModalOpen(true);
+    }
+  };
+  
+  const handleRequestEdit = (nodeId: string) => {
+    const node = graphData.nodes.find((n) => n.id === nodeId);
+    if (node) {
+      setEditingNode({
+        id: node.id,
+        label: node.label,
+        properties: node.properties || {},
+      });
     }
   };
 
@@ -130,12 +144,21 @@ export default function Page() {
           <LibraryPanel
             books={filteredBooks}
             activeBookId={activeBookId}
-            onBookSelect={setActiveBookId}
+            onBookSelect={(bookId) => {
+              setActiveBookId(bookId);
+              const node = graphData.nodes.find(
+                (n) => n.properties?.code === bookId,
+              );
+              if (node) {
+                handleRequestEdit(node.id);
+              }
+            }}
           />
 
           <GraphField
             graphData={graphData}
             activeBook={activeBook}
+            onRequestEdit={handleRequestEdit}
             onNodeClick={(nodeId) => {
 
               const node = graphData.nodes.find((n) => n.id === nodeId);
@@ -194,6 +217,36 @@ export default function Page() {
         existingBookCodes={new Set(books.map((b) => b.id))}
         onAddBook={handleAddBook}
       />
+
+      {editingNode && (
+        <EditBookModal
+          isOpen={editingNode !== null}
+          onClose={() => setEditingNode(null)}
+          node={editingNode}
+          onSave={async (nodeId, newDescription) => {
+            try {
+              const node = graphData.nodes.find((n) => n.id === nodeId);
+              if (!node) throw new Error("Node not found");
+
+              await graphApi.changeNode(nodeId, {
+                label: node.label,
+                properties: {
+                  ...node.properties,
+                  description: newDescription,
+                },
+              });
+
+              await refreshGraph();
+              setEditingNode(null);
+            } catch (error) {
+              if (error instanceof ApiError) {
+                throw new Error(error.message);
+              }
+              throw error;
+            }
+          }}
+        />
+      )}
     </main>
   );
 }

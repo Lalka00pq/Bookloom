@@ -26,7 +26,7 @@ export function EditBookModal({
     }
   }, [node]);
 
-  // Закрытие по Escape
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
