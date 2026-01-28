@@ -36,23 +36,33 @@ export function GraphField({
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(300, rect.width - 16),
-          height: Math.max(350, rect.height - 80), 
+          width: Math.floor(rect.width),
+          height: Math.floor(rect.height),
         });
       }
     };
 
-    const timeoutId = setTimeout(() => {
+    // Use ResizeObserver for more reliable size tracking
+    const resizeObserver = new ResizeObserver(() => {
       updateDimensions();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Initial measurement
+    updateDimensions();
+
+    const timeoutId = setTimeout(() => {
       if (graphRef.current) {
         graphRef.current.zoom(0.7);
       }
     }, 100);
 
-    window.addEventListener("resize", updateDimensions);
     return () => {
+      resizeObserver.disconnect();
       clearTimeout(timeoutId);
-      window.removeEventListener("resize", updateDimensions);
     };
   }, []);
 

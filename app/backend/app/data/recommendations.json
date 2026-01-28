@@ -5,50 +5,50 @@
       "book_id": null,
       "title": "Mona Lisa Overdrive",
       "author": "William Gibson",
-      "reason": "You've read the first two books of William Gibson's Sprawl Trilogy, 'Neuromancer' and 'Count Zero'. 'Mona Lisa Overdrive' is the third and concluding novel, a direct continuation of the story and world you've already enjoyed.",
+      "reason": "You have read 'Neuromancer' and 'Count Zero,' which are the first two books in William Gibson's seminal Sprawl Trilogy. 'Mona Lisa Overdrive' is the third and final novel in this series, making it a natural and highly recommended next read to complete the story and further explore the universe you've already enjoyed.",
       "score": 0.98,
       "metadata": {
-        "genre": "Cyberpunk",
+        "genre": "Science Fiction",
         "tags": [
-          "Science Fiction",
-          "Trilogy",
-          "Virtual Reality",
+          "Cyberpunk",
+          "Sprawl Trilogy",
           "Artificial Intelligence",
-          "Hacking"
+          "Virtual Reality",
+          "Dystopian"
         ]
       }
     },
     {
-      "book_id": "IUA_DwAAQBAJ",
-      "title": "Пикник на обочине (Roadside Picnic)",
-      "author": "Аркадий и Борис Стругацкие",
-      "reason": "This classic science fiction novel, already present in your graph, explores themes of mysterious alien artifacts and zones of altered reality. Its sense of the unknowable and complex, dangerous environments can appeal to readers who enjoyed the intricate and enigmatic world of 'Neuromancer'.",
-      "score": 0.85,
+      "book_id": null,
+      "title": "Snow Crash",
+      "author": "Neal Stephenson",
+      "reason": "As a fan of 'Neuromancer,' you'll appreciate 'Snow Crash' as another landmark work in the cyberpunk genre. It's known for its groundbreaking depiction of the metaverse, its unique blend of action and satire, and its complex world-building, offering a different but equally influential take on the cyberpunk aesthetic.",
+      "score": 0.92,
       "metadata": {
         "genre": "Science Fiction",
         "tags": [
-          "Alien Contact",
-          "Mysterious Zone",
-          "Philosophical",
-          "Classic Sci-Fi",
-          "Post-Apocalyptic"
+          "Cyberpunk",
+          "Dystopian",
+          "Virtual Reality",
+          "Metaverse",
+          "Action"
         ]
       }
     },
     {
-      "book_id": "E5khWQMmrTUC",
-      "title": "Solaris",
-      "author": "Stanisław Lem",
-      "reason": "Also from your graph, 'Solaris' is a profound science fiction classic that delves into the mystery of an alien intelligence (the sentient ocean) and humanity's attempts to comprehend it. This theme of grappling with an unknowable, powerful entity echoes the complex artificial intelligences and cyberspace found in 'Neuromancer'.",
-      "score": 0.82,
+      "book_id": null,
+      "title": "Do Androids Dream of Electric Sheep?",
+      "author": "Philip K. Dick",
+      "reason": "Given your interest in 'Neuromancer' (a cornerstone of cyberpunk) and 'Solaris' (philosophical science fiction), this classic by Philip K. Dick offers a compelling blend of these elements. It explores profound themes of humanity, artificial intelligence, and the nature of reality, which are central to both the cyberpunk genre and the introspective feel of 'Solaris'.",
+      "score": 0.9,
       "metadata": {
         "genre": "Science Fiction",
         "tags": [
-          "First Contact",
-          "Alien Intelligence",
-          "Psychological",
+          "Dystopian",
+          "Post-Apocalyptic",
+          "Artificial Intelligence",
           "Philosophical",
-          "Classic Sci-Fi"
+          "Proto-Cyberpunk"
         ]
       }
     }

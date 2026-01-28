@@ -63,13 +63,29 @@
         "description": "«Счастье для всех, и пусть никто не уйдёт обиженным!» Знаковые слова...Шедевр братьев Стругацких. Жёсткая, бесконечно увлекательная и в то же время бесконечно философская книга.Время идёт... Но история загадочной Зоны и лучшего из её сталкеров – Рэда Шухарта – по-прежнему тревожит и будоражит читателя.",
         "cover": "http://books.google.com/books/content?id=IUA_DwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
       }
+    },
+    {
+      "id": "5",
+      "label": "Дети капитана Гранта",
+      "properties": {
+        "code": "Mn5IEQAAQBAJ",
+        "title": "Дети капитана Гранта",
+        "author": "Жюль Верн",
+        "published": "2025-02-19",
+        "isbn": "9785047242323",
+        "subjects": [
+          "Travel"
+        ],
+        "description": "На поиски пропавшего капитана Гранта отправляется яхта «Дункан». Но не все ясно с маршрутом. В каком океане искать капитана? Великая классика Жюля Верна, неоднократно экранизированная.",
+        "cover": "http://books.google.com/books/content?id=Mn5IEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
     }
   ],
   "edges": [
     {
       "source": "1",
       "target": "2",
-      "weight": 1.0
+      "weight": 4.0
     }
   ]
 }
