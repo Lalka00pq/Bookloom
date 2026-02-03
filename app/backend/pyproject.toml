@@ -1,7 +1,7 @@
 [project]
-name = "bookloom"
+name = "bookloom-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend part of BookLoom application"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

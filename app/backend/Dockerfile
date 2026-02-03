@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM astral/uv:python3.12-bookworm-slim
 
 WORKDIR /app
 
@@ -6,10 +6,11 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
+ENV UV_SYSTEM_PYTHON=1
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
+COPY pyproject.toml uv.lock .
 
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv sync
 
 COPY . .
 
@@ -20,4 +21,4 @@ EXPOSE 8000
 ENV PORT=8000
 
 # Use shell form so environment variable substitution works at runtime
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["sh", "-c", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
