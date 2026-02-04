@@ -16,4 +16,6 @@ logs/
 *.log
 .idea
 tech.md
+tech_new.md
 code_analysis_report.md
+.github/
