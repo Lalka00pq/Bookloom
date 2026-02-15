@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 ENV UV_SYSTEM_PYTHON=1
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
-COPY pyproject.toml uv.lock .
+COPY pyproject.toml uv.lock ./
 
 RUN uv sync
 

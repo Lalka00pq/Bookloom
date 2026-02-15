@@ -1,0 +1,59 @@
+{
+  "user_id": "default_user",
+  "recommendations": [
+    {
+      "book_id": null,
+      "title": "Snow Crash",
+      "author": "Neal Stephenson",
+      "reason": "The user has shown a strong preference for cyberpunk by reading William Gibson's Sprawl trilogy (Neuromancer, Count Zero, Mona Lisa Overdrive). Snow Crash is a seminal work in the cyberpunk genre, known for its witty prose, unique world-building, and exploration of virtual reality and a dystopian future, making it an excellent continuation for fans of Gibson.",
+      "score": 0.9,
+      "metadata": {
+        "genre": "Cyberpunk",
+        "tags": [
+          "dystopian",
+          "virtual reality",
+          "hacker",
+          "futuristic",
+          "satire"
+        ]
+      }
+    },
+    {
+      "book_id": null,
+      "title": "Do Androids Dream of Electric Sheep?",
+      "author": "Philip K. Dick",
+      "reason": "This classic science fiction novel influenced the cyberpunk genre (which the user clearly enjoys) and delves into profound themes of humanity, empathy, and artificial intelligence. These themes resonate with the AI elements in Gibson's works and the philosophical depth explored in Stanisław Lem's 'Solaris'.",
+      "score": 0.85,
+      "metadata": {
+        "genre": "Science Fiction",
+        "tags": [
+          "androids",
+          "artificial intelligence",
+          "philosophy",
+          "dystopian",
+          "post-apocalyptic",
+          "classic sci-fi"
+        ]
+      }
+    },
+    {
+      "book_id": null,
+      "title": "Dune",
+      "author": "Frank Herbert",
+      "reason": "The user's interest in both classic sci-fi adventure (Jules Verne) and philosophical science fiction (Stanisław Lem) suggests an appreciation for epic, thought-provoking narratives. Dune is a monumental work of science fiction, offering intricate world-building, political intrigue, ecological themes, and deep philosophical concepts that would appeal to these varied sci-fi tastes.",
+      "score": 0.8,
+      "metadata": {
+        "genre": "Science Fiction",
+        "tags": [
+          "epic sci-fi",
+          "world-building",
+          "politics",
+          "ecology",
+          "philosophy",
+          "space opera",
+          "alien worlds"
+        ]
+      }
+    }
+  ]
+}
