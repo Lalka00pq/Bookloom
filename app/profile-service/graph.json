@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "label": "Neuromancer",
+      "properties": {
+        "code": "Bd_UZAdvUDIC",
+        "title": "Neuromancer",
+        "author": "William Gibson",
+        "published": "2000-07-01",
+        "isbn": "9781101146460",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "Winner of the Hugo, Nebula, and Philip K. Dick Awards, Neuromancer is a science fiction masterpiece—a classic that ranks as one of the twentieth century’s most potent visions of the future. Case was the sharpest data-thief in the matrix—until he crossed the wrong people and they crippled his nervous system, banishing him from cyberspace. Now a mysterious new employer has recruited him for a last-chance run at an unthinkably powerful artificial intelligence. With a dead man riding shotgun and Molly, a mirror-eyed street-samurai, to watch his back, Case is ready for the adventure that upped the ante on an entire genre of fiction. Neuromancer was the first fully-realized glimpse of humankind’s digital future—a shocking vision that has challenged our assumptions about technology and ourselves, reinvented the way we speak and think, and forever altered the landscape of our imaginations.",
+        "cover": "http://books.google.com/books/content?id=Bd_UZAdvUDIC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "2",
+      "label": "Mona Lisa Overdrive",
+      "properties": {
+        "code": "LS6KCwAAQBAJ",
+        "title": "Mona Lisa Overdrive",
+        "author": "William Gibson",
+        "published": "2016-08-11",
+        "isbn": "9781473217430",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "The ghost was her father's parting gift, presented by a black-clad secretary in a departure lounge at Narita.. Mona is a young girl with a murky past and an uncertain future whose life is turned upside down when her pimp sells her to a plastic surgeon in New York and overnight she's turned into someone else. Angie Mitchell is a famous Hollywood Sense/Net star with a special talent. And despite the efforts of studio bosses to keep her in ignorance, Angie's started remembering things. Soon she'll discover who she really is . . . and why she doesn't need a deck in order to enter cyberspace. From inside the matrix, plots are set in motion and human beings are being played like pieces on a board. And behind the intrigue lurks the shadowy Yazuka, the powerful Japanese underworld, whose leaders ruthlessly manipulate people and events to suit their own purposes. Or so they think . . .",
+        "cover": "http://books.google.com/books/content?id=LS6KCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "3",
+      "label": "Count Zero",
+      "properties": {
+        "code": "4y2KCwAAQBAJ",
+        "title": "Count Zero",
+        "author": "William Gibson",
+        "published": "2016-08-11",
+        "isbn": "9781473217416",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "They set a Slamhound on Turner's trail in New Delhi, slotted it to his pheromones and the colour of his hair. When the Maas Biolabs and Hosaka zaibatsus fight it out for world domination, computer cowboys like Turner and Count Zero are just foot soldiers in the great game: useful but ultimately expendable. When Turner wakes up in Mexico - in a new body with a beautiful woman beside him - his corporate masters let him recuperate for a while, then reactivate his memory for a mission even more dangerous than the one that nearly killed him: the head designer from Maas Biolabs says he wants to defect to Hosaka, and it's Turner's job to deliver him safely. Count Zero is a rustbelt data-hustler totally unprepared for what comes his way when the designer's defection triggers war in cyberspace. With voodoo gods in the Net and angels in the software, he can only hope that the megacorps and the super-rich have their virtual hands too full to notice the amateur hacker with the black market kit trying desperately to stay alive . . .",
+        "cover": "http://books.google.com/books/content?id=4y2KCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "4",
+      "label": "Captain Alatriste",
+      "properties": {
+        "code": "HnnjxBjjwO0C",
+        "title": "Captain Alatriste",
+        "author": "Arturo Pérez-Reverte",
+        "published": "2005-12-27",
+        "isbn": "9781101639849",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "The first action-packed historical adventure in the internationally acclaimed Captain Alatriste series, featuring a Spanish soldier who lives as a swordsman-for-hire in 17th century Madrid. Needing gold to pay off his debts, Captain Alatriste and another hired blade are paid to ambush two travelers, stage a robbery, and give the travelers a fright. “No blood,” they are told. Then a mysterious stranger enters to clarify the job: he increases the pay, and tells Alatriste that, instead, he must murder the two travelers. When the attack unfolds, Alatriste realizes that these aren’t ordinary travelers, and what happens next is only the first in a riveting series of twists and turns, with implications that will reverberate throughout the courts of Europe...",
+        "cover": "http://books.google.com/books/content?id=HnnjxBjjwO0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "5",
+      "label": "Двадцать тысяч лье под водой. Иллюстрированное издание",
+      "properties": {
+        "code": "2-hQEQAAQBAJ",
+        "title": "Двадцать тысяч лье под водой. Иллюстрированное издание",
+        "author": "Жюль Верн",
+        "published": "2024",
+        "isbn": "9785501288973",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "Перед вами классический роман Жюля Верна «Двадцать тысяч лье под водой» в переводе Игнатия Петрова, который на протяжении десятилетий остаётся одним из самых читаемых и узнаваемых. Это издание включает более 170 иллюстраций, что делает его самым насыщенным визуальным изданием романа на русском языке. В книгу вошли оригинальные рисунки Альфонса де Нёвиля из французского издания 1871 года и иллюстрации советского художника Петра Луганского. Роман рассказывает о кругосветном путешествии на борту подводного корабля «Наутилус» под командованием капитана Немо. Читателей ждут открытия подводного мира, столкновения с гигантскими морскими существами, затонувшие корабли и руины Атлантиды. Издание подготовлено с учетом удобства чтения на цифровых устройствах, сохраняя стиль оригинального текста и визуальную целостность исторических иллюстраций.",
+        "cover": "http://books.google.com/books/content?id=2-hQEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    },
+    {
+      "id": "6",
+      "label": "Солярис. Эдем",
+      "properties": {
+        "code": "BjZnEAAAQBAJ",
+        "title": "Солярис. Эдем",
+        "author": "Станислав Лем",
+        "published": "2022-03-31",
+        "isbn": "9785044152120",
+        "subjects": [
+          "Fiction"
+        ],
+        "description": "«Солярис» – бесспорная вершина творчества Станислава Лема, произведение, повлиявшее на развитие научной фантастики XX века, в том числе и на русскую фантастику. Роман дважды экранизирован, по нему были поставлены радиопьесы, спектакли – и даже балет!Итак, что же такое Солярис? Бескрайний мыслящий океан, преследующий непонятные человеку цели, тончайший камертон, преобразующий людские чувства в материальную форму? Воплощенный кошмар психолога или духовный целитель? Со дня публикации книги прошло больше 50 лет, а ее читатели все так же продолжают задаваться вопросами, ответы на которые невозможно получить, не заглянув в свое собственное сердце.«Эдем» – удивительный сплав динамичного боевика, социальной драмы и жесткой антиутопии – можно смело поставить в один ряд с такими классическими произведениями научной фантастики, как «451° по Фаренгейту» Рэя Брэдбери и роман Джорджа Оруэлла «1984».«Среди звезд нас ждет неизвестное!» – фраза Лема, ставшая крылатой, имеет ощутимо горький привкус разочарования. Процесс познания несет в себе ядовитое ядро, и присущий человечеству гуманизм оказывается бессильным при столкновении с чуждым инопланетным разумом на прекрасной и таинственной планете Эдем...",
+        "cover": "http://books.google.com/books/content?id=BjZnEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+      }
+    }
+  ],
+  "edges": []
+}
